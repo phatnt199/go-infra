@@ -16,7 +16,7 @@ import (
 	"os"
 	"time"
 
-	"local/go-infra/pkg/application/environment"
+	"github.com/phatnt199/go-infra/pkg/application/environment"
 
 	"emperror.dev/errors"
 	"github.com/samber/lo"

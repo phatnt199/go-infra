@@ -3,7 +3,7 @@ package persistmessage
 import (
 	"context"
 
-	"local/go-infra/pkg/core/messaging/types"
+	"github.com/phatnt199/go-infra/pkg/core/messaging/types"
 
 	uuid "github.com/satori/go.uuid"
 )

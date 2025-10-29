@@ -3,7 +3,8 @@ package customErrors
 import (
 	"fmt"
 	"io"
-	"local/go-infra/pkg/adapter/http/httperrors/contracts"
+
+	"github.com/phatnt199/go-infra/pkg/adapter/http/httperrors/contracts"
 
 	"emperror.dev/errors"
 )

@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"time"
 
-	"local/go-infra/pkg/core/messaging/pipeline"
-	types2 "local/go-infra/pkg/core/messaging/types"
-	"local/go-infra/pkg/otel/constants/telemetrytags"
-	"local/go-infra/pkg/otel/metrics"
-	attribute2 "local/go-infra/pkg/otel/tracing/attribute"
+	"github.com/phatnt199/go-infra/pkg/core/messaging/pipeline"
+	types2 "github.com/phatnt199/go-infra/pkg/core/messaging/types"
+	"github.com/phatnt199/go-infra/pkg/otel/constants/telemetrytags"
+	"github.com/phatnt199/go-infra/pkg/otel/metrics"
+	attribute2 "github.com/phatnt199/go-infra/pkg/otel/tracing/attribute"
 
 	"github.com/iancoleman/strcase"
 	"go.opentelemetry.io/otel/attribute"

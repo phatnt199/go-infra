@@ -5,7 +5,7 @@ import (
 
 	"github.com/TylerBrock/colorjson"
 	"github.com/goccy/go-json"
-	"local/go-infra/pkg/core/serializer"
+	"github.com/phatnt199/go-infra/pkg/core/serializer"
 	"github.com/mitchellh/mapstructure"
 )
 

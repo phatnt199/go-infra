@@ -3,7 +3,7 @@ package events
 import (
 	"time"
 
-	typeMapper "local/go-infra/pkg/reflection/typemapper"
+	typeMapper "github.com/phatnt199/go-infra/pkg/reflection/typemapper"
 
 	uuid "github.com/satori/go.uuid"
 )

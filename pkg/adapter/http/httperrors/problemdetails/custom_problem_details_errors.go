@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"time"
 
-	"local/go-infra/pkg/application/constants"
+	"github.com/phatnt199/go-infra/pkg/application/constants"
 )
 
 func NewValidationProblemDetail(detail string, stackTrace string) ProblemDetailErr {

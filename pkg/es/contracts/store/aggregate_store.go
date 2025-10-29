@@ -3,11 +3,11 @@ package store
 import (
 	"context"
 
-	"local/go-infra/pkg/core/metadata"
-	"local/go-infra/pkg/es/models"
-	appendResult "local/go-infra/pkg/es/models/append_result"
-	readPosition "local/go-infra/pkg/es/models/stream_position/read_position"
-	expectedStreamVersion "local/go-infra/pkg/es/models/stream_version"
+	"github.com/phatnt199/go-infra/pkg/core/metadata"
+	"github.com/phatnt199/go-infra/pkg/es/models"
+	appendResult "github.com/phatnt199/go-infra/pkg/es/models/append_result"
+	readPosition "github.com/phatnt199/go-infra/pkg/es/models/stream_position/read_position"
+	expectedStreamVersion "github.com/phatnt199/go-infra/pkg/es/models/stream_version"
 
 	uuid "github.com/satori/go.uuid"
 )

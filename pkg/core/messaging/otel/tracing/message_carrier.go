@@ -1,6 +1,6 @@
 package tracing
 
-import "local/go-infra/pkg/core/metadata"
+import "github.com/phatnt199/go-infra/pkg/core/metadata"
 
 type MessageCarrier struct {
 	meta *metadata.Metadata

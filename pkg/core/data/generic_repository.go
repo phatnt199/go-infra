@@ -3,8 +3,8 @@ package data
 import (
 	"context"
 
-	"local/go-infra/pkg/core/data/specification"
-	"local/go-infra/pkg/utils"
+	"github.com/phatnt199/go-infra/pkg/core/data/specification"
+	"github.com/phatnt199/go-infra/pkg/utils"
 
 	uuid "github.com/satori/go.uuid"
 )

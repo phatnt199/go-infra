@@ -3,7 +3,7 @@ package tracing
 import (
 	"context"
 
-	"local/go-infra/pkg/otel/tracing/utils"
+	"github.com/phatnt199/go-infra/pkg/otel/tracing/utils"
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/trace"

@@ -7,10 +7,10 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"local/go-infra/pkg/core/domain"
-	"local/go-infra/pkg/core/metadata"
-	errors2 "local/go-infra/pkg/es/errors"
-	expectedStreamVersion "local/go-infra/pkg/es/models/stream_version"
+	"github.com/phatnt199/go-infra/pkg/core/domain"
+	"github.com/phatnt199/go-infra/pkg/core/metadata"
+	errors2 "github.com/phatnt199/go-infra/pkg/es/errors"
+	expectedStreamVersion "github.com/phatnt199/go-infra/pkg/es/models/stream_version"
 
 	"emperror.dev/errors"
 	"github.com/ahmetb/go-linq/v3"

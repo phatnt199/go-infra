@@ -3,7 +3,7 @@ package tracing
 import (
 	"context"
 
-	"local/go-infra/pkg/logger"
+	"github.com/phatnt199/go-infra/pkg/logger"
 
 	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/fx"

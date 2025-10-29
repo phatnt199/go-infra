@@ -3,7 +3,7 @@ package types
 import (
 	"time"
 
-	typeMapper "local/go-infra/pkg/reflection/typemapper"
+	typeMapper "github.com/phatnt199/go-infra/pkg/reflection/typemapper"
 )
 
 type IMessage interface {

@@ -1,8 +1,8 @@
 package json
 
 import (
-	"local/go-infra/pkg/core/metadata"
-	"local/go-infra/pkg/core/serializer"
+	"github.com/phatnt199/go-infra/pkg/core/metadata"
+	"github.com/phatnt199/go-infra/pkg/core/serializer"
 
 	"emperror.dev/errors"
 )

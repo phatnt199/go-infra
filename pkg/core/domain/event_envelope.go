@@ -1,7 +1,7 @@
 package domain
 
 import (
-	"local/go-infra/pkg/core/metadata"
+	"github.com/phatnt199/go-infra/pkg/core/metadata"
 )
 
 type EventEnvelope struct {

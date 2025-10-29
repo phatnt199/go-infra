@@ -1,14 +1,15 @@
 package zap
 
 import (
-	"local/go-infra/pkg/application/constants"
-	"local/go-infra/pkg/application/environment"
-	"local/go-infra/pkg/logger"
 	"os"
 	"time"
 
-	config2 "local/go-infra/pkg/logger/config"
-	"local/go-infra/pkg/logger/models"
+	"github.com/phatnt199/go-infra/pkg/application/constants"
+	"github.com/phatnt199/go-infra/pkg/application/environment"
+	"github.com/phatnt199/go-infra/pkg/logger"
+
+	config2 "github.com/phatnt199/go-infra/pkg/logger/config"
+	"github.com/phatnt199/go-infra/pkg/logger/models"
 
 	"github.com/uptrace/opentelemetry-go-extra/otelzap"
 	"go.uber.org/zap"

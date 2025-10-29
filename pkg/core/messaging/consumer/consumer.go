@@ -3,7 +3,7 @@ package consumer
 import (
 	"context"
 
-	"local/go-infra/pkg/core/messaging/types"
+	"github.com/phatnt199/go-infra/pkg/core/messaging/types"
 )
 
 type Consumer interface {

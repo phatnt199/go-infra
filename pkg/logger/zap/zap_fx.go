@@ -1,8 +1,8 @@
 package zap
 
 import (
-	"local/go-infra/pkg/logger"
-	"local/go-infra/pkg/logger/config"
+	"github.com/phatnt199/go-infra/pkg/logger"
+	"github.com/phatnt199/go-infra/pkg/logger/config"
 
 	"go.uber.org/fx"
 )

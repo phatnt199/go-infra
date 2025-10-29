@@ -7,7 +7,7 @@ import (
 	"encoding/base64"
 	"io"
 
-	"local/go-infra/pkg/errors"
+	"github.com/phatnt199/go-infra/pkg/errors"
 )
 
 // EncryptionConfig holds encryption configuration

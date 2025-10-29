@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"strings"
 
-	"local/go-infra/pkg/otel/constants/telemetrytags"
-	"local/go-infra/pkg/otel/constants/tracing/components"
-	"local/go-infra/pkg/otel/tracing"
-	customAttribute "local/go-infra/pkg/otel/tracing/attribute"
-	"local/go-infra/pkg/otel/tracing/utils"
-	typeMapper "local/go-infra/pkg/reflection/typemapper"
+	"github.com/phatnt199/go-infra/pkg/otel/constants/telemetrytags"
+	"github.com/phatnt199/go-infra/pkg/otel/constants/tracing/components"
+	"github.com/phatnt199/go-infra/pkg/otel/tracing"
+	customAttribute "github.com/phatnt199/go-infra/pkg/otel/tracing/attribute"
+	"github.com/phatnt199/go-infra/pkg/otel/tracing/utils"
+	typeMapper "github.com/phatnt199/go-infra/pkg/reflection/typemapper"
 
 	"github.com/mehdihadeli/go-mediatr"
 	"go.opentelemetry.io/otel/attribute"

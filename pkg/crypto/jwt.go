@@ -8,7 +8,7 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 
-	"local/go-infra/pkg/errors"
+	"github.com/phatnt199/go-infra/pkg/errors"
 )
 
 // JWTAlgorithm represents the JWT signing algorithm

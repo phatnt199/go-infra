@@ -9,7 +9,7 @@ import (
 	"golang.org/x/crypto/argon2"
 	"golang.org/x/crypto/bcrypt"
 
-	"local/go-infra/pkg/errors"
+	"github.com/phatnt199/go-infra/pkg/errors"
 )
 
 // HashAlgorithm represents the hashing algorithm type

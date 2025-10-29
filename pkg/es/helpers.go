@@ -3,7 +3,7 @@ package es
 import (
 	"fmt"
 
-	"local/go-infra/pkg/es/contracts/projection"
+	"github.com/phatnt199/go-infra/pkg/es/contracts/projection"
 
 	"go.uber.org/fx"
 )

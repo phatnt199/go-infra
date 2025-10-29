@@ -1,7 +1,7 @@
 package config
 
 import (
-	"local/go-infra/pkg/application/environment"
+	"github.com/phatnt199/go-infra/pkg/application/environment"
 
 	"go.uber.org/fx"
 )

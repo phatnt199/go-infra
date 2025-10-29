@@ -7,9 +7,9 @@ import (
 	"reflect"
 	"time"
 
-	"local/go-infra/pkg/adapter/http/httperrors/contracts"
-	defaultLogger "local/go-infra/pkg/logger/default_logger"
-	typeMapper "local/go-infra/pkg/reflection/typemapper"
+	"github.com/phatnt199/go-infra/pkg/adapter/http/httperrors/contracts"
+	defaultLogger "github.com/phatnt199/go-infra/pkg/logger/default_logger"
+	typeMapper "github.com/phatnt199/go-infra/pkg/reflection/typemapper"
 
 	"emperror.dev/errors"
 )

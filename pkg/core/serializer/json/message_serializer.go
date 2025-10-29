@@ -3,9 +3,9 @@ package json
 import (
 	"reflect"
 
-	"local/go-infra/pkg/core/messaging/types"
-	"local/go-infra/pkg/core/serializer"
-	typeMapper "local/go-infra/pkg/reflection/typemapper"
+	"github.com/phatnt199/go-infra/pkg/core/messaging/types"
+	"github.com/phatnt199/go-infra/pkg/core/serializer"
+	typeMapper "github.com/phatnt199/go-infra/pkg/reflection/typemapper"
 
 	"emperror.dev/errors"
 )

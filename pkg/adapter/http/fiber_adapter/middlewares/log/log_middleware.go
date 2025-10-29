@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"local/go-infra/pkg/logger"
+	"github.com/phatnt199/go-infra/pkg/logger"
 
 	"github.com/gofiber/fiber/v2"
 )

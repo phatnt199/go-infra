@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"time"
 
-	"local/go-infra/pkg/core/cqrs"
-	"local/go-infra/pkg/core/events"
-	"local/go-infra/pkg/otel/constants/telemetrytags"
-	"local/go-infra/pkg/otel/metrics"
-	customAttribute "local/go-infra/pkg/otel/tracing/attribute"
-	"local/go-infra/pkg/reflection/typemapper"
+	"github.com/phatnt199/go-infra/pkg/core/cqrs"
+	"github.com/phatnt199/go-infra/pkg/core/events"
+	"github.com/phatnt199/go-infra/pkg/otel/constants/telemetrytags"
+	"github.com/phatnt199/go-infra/pkg/otel/metrics"
+	customAttribute "github.com/phatnt199/go-infra/pkg/otel/tracing/attribute"
+	"github.com/phatnt199/go-infra/pkg/reflection/typemapper"
 
 	"github.com/mehdihadeli/go-mediatr"
 	"go.opentelemetry.io/otel/attribute"

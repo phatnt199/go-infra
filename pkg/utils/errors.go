@@ -2,8 +2,8 @@ package utils
 
 import (
 	"fmt"
-	"local/go-infra/pkg/adapter/http/httperrors/contracts"
-	defaultLogger "local/go-infra/pkg/logger/default_logger"
+	"github.com/phatnt199/go-infra/pkg/adapter/http/httperrors/contracts"
+	defaultLogger "github.com/phatnt199/go-infra/pkg/logger/default_logger"
 	"runtime/debug"
 	"strings"
 

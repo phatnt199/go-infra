@@ -8,9 +8,9 @@ import (
 	"context"
 	"time"
 
-	"local/go-infra/pkg/adapter/http/contracts"
-	"local/go-infra/pkg/application/environment"
-	"local/go-infra/pkg/logger"
+	"github.com/phatnt199/go-infra/pkg/adapter/http/contracts"
+	"github.com/phatnt199/go-infra/pkg/application/environment"
+	"github.com/phatnt199/go-infra/pkg/logger"
 
 	"emperror.dev/errors"
 	"github.com/gofiber/fiber/v2"

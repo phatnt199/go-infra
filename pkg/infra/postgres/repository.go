@@ -8,7 +8,7 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 
-	"local/go-infra/pkg/errors"
+	"github.com/phatnt199/go-infra/pkg/errors"
 )
 
 // Repository is a generic GORM repository implementation

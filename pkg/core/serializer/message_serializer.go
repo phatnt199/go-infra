@@ -3,7 +3,7 @@ package serializer
 import (
 	"reflect"
 
-	"local/go-infra/pkg/core/messaging/types"
+	"github.com/phatnt199/go-infra/pkg/core/messaging/types"
 )
 
 type MessageSerializer interface {

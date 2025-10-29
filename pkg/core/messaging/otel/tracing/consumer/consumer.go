@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"time"
 
-	messageHeader "local/go-infra/pkg/core/messaging/messageheader"
-	"local/go-infra/pkg/core/messaging/otel/tracing"
-	"local/go-infra/pkg/core/metadata"
+	messageHeader "github.com/phatnt199/go-infra/pkg/core/messaging/messageheader"
+	"github.com/phatnt199/go-infra/pkg/core/messaging/otel/tracing"
+	"github.com/phatnt199/go-infra/pkg/core/metadata"
 
-	"local/go-infra/pkg/otel/constants"
-	tracingHeaders "local/go-infra/pkg/otel/tracing/tracing_headers"
-	"local/go-infra/pkg/otel/tracing/utils"
+	"github.com/phatnt199/go-infra/pkg/otel/constants"
+	tracingHeaders "github.com/phatnt199/go-infra/pkg/otel/tracing/tracing_headers"
+	"github.com/phatnt199/go-infra/pkg/otel/tracing/utils"
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"

@@ -1,8 +1,8 @@
 package bus
 
 import (
-	consumer2 "local/go-infra/pkg/core/messaging/consumer"
-	"local/go-infra/pkg/core/messaging/producer"
+	consumer2 "github.com/phatnt199/go-infra/pkg/core/messaging/consumer"
+	"github.com/phatnt199/go-infra/pkg/core/messaging/producer"
 )
 
 type Bus interface {

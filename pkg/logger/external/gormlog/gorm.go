@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"local/go-infra/pkg/logger"
+	"github.com/phatnt199/go-infra/pkg/logger"
 
 	gormlogger "gorm.io/gorm/logger"
 )

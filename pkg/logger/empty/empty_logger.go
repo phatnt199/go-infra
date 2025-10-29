@@ -3,8 +3,8 @@ package empty
 import (
 	"time"
 
-	"local/go-infra/pkg/logger"
-	"local/go-infra/pkg/logger/models"
+	"github.com/phatnt199/go-infra/pkg/logger"
+	"github.com/phatnt199/go-infra/pkg/logger/models"
 )
 
 var EmptyLogger logger.Logger = &emptyLogger{}

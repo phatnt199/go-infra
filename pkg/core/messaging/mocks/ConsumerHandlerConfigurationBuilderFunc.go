@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	consumer "local/go-infra/pkg/core/messaging/consumer"
+	consumer "github.com/phatnt199/go-infra/pkg/core/messaging/consumer"
 	mock "github.com/stretchr/testify/mock"
 )
 

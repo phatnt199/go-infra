@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"net/url"
 
-	"local/go-infra/pkg/adapter/http/contracts"
+	"github.com/phatnt199/go-infra/pkg/adapter/http/contracts"
 
 	"github.com/gofiber/fiber/v2"
 )

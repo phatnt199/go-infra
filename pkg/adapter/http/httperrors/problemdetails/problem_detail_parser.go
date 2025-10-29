@@ -6,10 +6,10 @@ import (
 	"net/http"
 	"reflect"
 
-	customErrors "local/go-infra/pkg/adapter/http/httperrors/customerrors"
-	"local/go-infra/pkg/application/constants"
-	typeMapper "local/go-infra/pkg/reflection/typemapper"
-	utils "local/go-infra/pkg/utils"
+	customErrors "github.com/phatnt199/go-infra/pkg/adapter/http/httperrors/customerrors"
+	"github.com/phatnt199/go-infra/pkg/application/constants"
+	typeMapper "github.com/phatnt199/go-infra/pkg/reflection/typemapper"
+	utils "github.com/phatnt199/go-infra/pkg/utils"
 
 	"emperror.dev/errors"
 	"github.com/go-playground/validator"

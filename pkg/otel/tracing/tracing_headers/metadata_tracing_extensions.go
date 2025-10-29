@@ -1,7 +1,7 @@
 package tracingHeaders
 
 import (
-	"local/go-infra/pkg/core/metadata"
+	"github.com/phatnt199/go-infra/pkg/core/metadata"
 )
 
 func GetTracingTraceId(m metadata.Metadata) string {

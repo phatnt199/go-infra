@@ -3,7 +3,7 @@ package es
 import (
 	"context"
 
-	"local/go-infra/pkg/es/contracts"
+	"github.com/phatnt199/go-infra/pkg/es/contracts"
 )
 
 type inMemorySubscriptionCheckpointRepository struct {

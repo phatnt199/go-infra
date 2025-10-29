@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"reflect"
 
-	defaultLogger "local/go-infra/pkg/logger/default_logger"
-	reflectionHelper "local/go-infra/pkg/reflection/reflection_helper"
+	defaultLogger "github.com/phatnt199/go-infra/pkg/logger/default_logger"
+	reflectionHelper "github.com/phatnt199/go-infra/pkg/reflection/reflection_helper"
 
 	"emperror.dev/errors"
 	"github.com/ahmetb/go-linq/v3"

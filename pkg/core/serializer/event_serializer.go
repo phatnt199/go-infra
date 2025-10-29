@@ -3,7 +3,7 @@ package serializer
 import (
 	"reflect"
 
-	"local/go-infra/pkg/core/domain"
+	"github.com/phatnt199/go-infra/pkg/core/domain"
 )
 
 type EventSerializer interface {

@@ -1,7 +1,7 @@
 package consumer
 
 import (
-	"local/go-infra/pkg/core/messaging/types"
+	"github.com/phatnt199/go-infra/pkg/core/messaging/types"
 )
 
 type ConsumerConnector interface {

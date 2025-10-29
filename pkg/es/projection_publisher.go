@@ -3,8 +3,8 @@ package es
 import (
 	"context"
 
-	"local/go-infra/pkg/es/contracts/projection"
-	"local/go-infra/pkg/es/models"
+	"github.com/phatnt199/go-infra/pkg/es/contracts/projection"
+	"github.com/phatnt199/go-infra/pkg/es/models"
 
 	"emperror.dev/errors"
 )

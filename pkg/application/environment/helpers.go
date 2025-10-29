@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"local/go-infra/pkg/application/constants"
+	"github.com/phatnt199/go-infra/pkg/application/constants"
 
 	"emperror.dev/errors"
 	"github.com/spf13/viper"

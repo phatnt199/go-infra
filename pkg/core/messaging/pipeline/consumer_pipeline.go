@@ -3,7 +3,7 @@ package pipeline
 import (
 	"context"
 
-	"local/go-infra/pkg/core/messaging/types"
+	"github.com/phatnt199/go-infra/pkg/core/messaging/types"
 )
 
 // ConsumerHandlerFunc is a continuation for the next task to execute in the pipeline

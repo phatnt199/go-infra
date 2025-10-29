@@ -1,9 +1,9 @@
 package handlers
 
 import (
-	"local/go-infra/pkg/logger"
+	"github.com/phatnt199/go-infra/pkg/logger"
 
-	"local/go-infra/pkg/adapter/http/httperrors/problemdetails"
+	"github.com/phatnt199/go-infra/pkg/adapter/http/httperrors/problemdetails"
 
 	"emperror.dev/errors"
 	"github.com/gofiber/fiber/v2"

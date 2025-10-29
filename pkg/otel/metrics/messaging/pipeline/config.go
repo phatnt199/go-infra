@@ -1,8 +1,8 @@
 package pipelines
 
 import (
-	"local/go-infra/pkg/logger"
-	defaultLogger "local/go-infra/pkg/logger/default_logger"
+	"github.com/phatnt199/go-infra/pkg/logger"
+	defaultLogger "github.com/phatnt199/go-infra/pkg/logger/default_logger"
 )
 
 type config struct {

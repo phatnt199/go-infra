@@ -1,8 +1,8 @@
 package empty
 
 import (
-	logger2 "local/go-infra/pkg/logger"
-	"local/go-infra/pkg/logger/config"
+	logger2 "github.com/phatnt199/go-infra/pkg/logger"
+	"github.com/phatnt199/go-infra/pkg/logger/config"
 
 	"go.uber.org/fx"
 )

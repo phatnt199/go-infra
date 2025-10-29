@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	domain "local/go-infra/pkg/core/domain"
+	domain "github.com/phatnt199/go-infra/pkg/core/domain"
 
 	mock "github.com/stretchr/testify/mock"
 )

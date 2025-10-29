@@ -3,8 +3,8 @@ package utils
 import (
 	"reflect"
 
-	"local/go-infra/pkg/core/messaging/types"
-	typeMapper "local/go-infra/pkg/reflection/typemapper"
+	"github.com/phatnt199/go-infra/pkg/core/messaging/types"
+	typeMapper "github.com/phatnt199/go-infra/pkg/reflection/typemapper"
 
 	"github.com/ahmetb/go-linq/v3"
 	"github.com/iancoleman/strcase"

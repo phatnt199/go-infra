@@ -3,12 +3,12 @@ package store
 import (
 	"context"
 
-	"local/go-infra/pkg/es/models"
-	appendResult "local/go-infra/pkg/es/models/append_result"
-	streamName "local/go-infra/pkg/es/models/stream_name"
-	readPosition "local/go-infra/pkg/es/models/stream_position/read_position"
-	"local/go-infra/pkg/es/models/stream_position/truncatePosition"
-	expectedStreamVersion "local/go-infra/pkg/es/models/stream_version"
+	"github.com/phatnt199/go-infra/pkg/es/models"
+	appendResult "github.com/phatnt199/go-infra/pkg/es/models/append_result"
+	streamName "github.com/phatnt199/go-infra/pkg/es/models/stream_name"
+	readPosition "github.com/phatnt199/go-infra/pkg/es/models/stream_position/read_position"
+	"github.com/phatnt199/go-infra/pkg/es/models/stream_position/truncatePosition"
+	expectedStreamVersion "github.com/phatnt199/go-infra/pkg/es/models/stream_version"
 )
 
 type EventStore interface {

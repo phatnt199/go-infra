@@ -1,11 +1,12 @@
 package environment
 
 import (
-	"local/go-infra/pkg/application/constants"
 	"log"
 	"os"
 	"path/filepath"
 	"syscall"
+
+	"github.com/phatnt199/go-infra/pkg/application/constants"
 
 	"emperror.dev/errors"
 	"github.com/joho/godotenv"

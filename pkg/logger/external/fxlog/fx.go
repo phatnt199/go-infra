@@ -3,7 +3,7 @@ package fxlog
 import (
 	"strings"
 
-	"local/go-infra/pkg/logger"
+	"github.com/phatnt199/go-infra/pkg/logger"
 
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxevent"

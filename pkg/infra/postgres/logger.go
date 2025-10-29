@@ -6,7 +6,7 @@ import (
 
 	gormlogger "gorm.io/gorm/logger"
 
-	"local/go-infra/pkg/logger"
+	"github.com/phatnt199/go-infra/pkg/logger"
 )
 
 // gormLogger implements GORM's logger interface using our custom logger

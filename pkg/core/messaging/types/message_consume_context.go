@@ -3,7 +3,7 @@ package types
 import (
 	"time"
 
-	"local/go-infra/pkg/core/metadata"
+	"github.com/phatnt199/go-infra/pkg/core/metadata"
 )
 
 type MessageConsumeContext interface {

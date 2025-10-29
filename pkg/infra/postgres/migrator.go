@@ -11,9 +11,9 @@ import (
 
 	"gorm.io/gorm"
 
-	"local/go-infra/pkg/errors"
-	"local/go-infra/pkg/logger"
-	defaultLogger "local/go-infra/pkg/logger/default_logger"
+	"github.com/phatnt199/go-infra/pkg/errors"
+	"github.com/phatnt199/go-infra/pkg/logger"
+	defaultLogger "github.com/phatnt199/go-infra/pkg/logger/default_logger"
 )
 
 // Migrator handles database migrations

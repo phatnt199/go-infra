@@ -3,7 +3,7 @@ package projection
 import (
 	"context"
 
-	"local/go-infra/pkg/es/models"
+	"github.com/phatnt199/go-infra/pkg/es/models"
 )
 
 type IProjection interface {

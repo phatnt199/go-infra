@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"strings"
 
-	"local/go-infra/pkg/adapter/http/contracts"
-	"local/go-infra/pkg/adapter/http/fiber_adapter/config"
-	"local/go-infra/pkg/adapter/http/fiber_adapter/handlers"
-	"local/go-infra/pkg/adapter/http/fiber_adapter/middlewares/log"
-	"local/go-infra/pkg/application/constants"
-	"local/go-infra/pkg/logger"
+	"github.com/phatnt199/go-infra/pkg/adapter/http/contracts"
+	"github.com/phatnt199/go-infra/pkg/adapter/http/fiber_adapter/config"
+	"github.com/phatnt199/go-infra/pkg/adapter/http/fiber_adapter/handlers"
+	"github.com/phatnt199/go-infra/pkg/adapter/http/fiber_adapter/middlewares/log"
+	"github.com/phatnt199/go-infra/pkg/application/constants"
+	"github.com/phatnt199/go-infra/pkg/logger"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/compress"

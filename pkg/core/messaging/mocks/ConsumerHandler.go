@@ -5,7 +5,7 @@ package mocks
 import (
 	context "context"
 
-	types "local/go-infra/pkg/core/messaging/types"
+	types "github.com/phatnt199/go-infra/pkg/core/messaging/types"
 	mock "github.com/stretchr/testify/mock"
 )
 

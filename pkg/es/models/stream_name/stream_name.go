@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"local/go-infra/pkg/es/models"
+	"github.com/phatnt199/go-infra/pkg/es/models"
 
 	"github.com/goccy/go-reflect"
 	uuid "github.com/satori/go.uuid"

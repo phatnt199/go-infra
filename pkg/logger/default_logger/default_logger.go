@@ -1,12 +1,13 @@
 package defaultlogger
 
 import (
-	"local/go-infra/pkg/application/constants"
-	"local/go-infra/pkg/logger"
-	"local/go-infra/pkg/logger/config"
-	"local/go-infra/pkg/logger/models"
-	"local/go-infra/pkg/logger/zap"
 	"os"
+
+	"github.com/phatnt199/go-infra/pkg/application/constants"
+	"github.com/phatnt199/go-infra/pkg/logger"
+	"github.com/phatnt199/go-infra/pkg/logger/config"
+	"github.com/phatnt199/go-infra/pkg/logger/models"
+	"github.com/phatnt199/go-infra/pkg/logger/zap"
 )
 
 var l logger.Logger

@@ -5,8 +5,8 @@ package mocks
 import (
 	context "context"
 
-	persistmessage "local/go-infra/pkg/core/messaging/persistmessage"
-	types "local/go-infra/pkg/core/messaging/types"
+	persistmessage "github.com/phatnt199/go-infra/pkg/core/messaging/persistmessage"
+	types "github.com/phatnt199/go-infra/pkg/core/messaging/types"
 
 	mock "github.com/stretchr/testify/mock"
 

@@ -1,8 +1,8 @@
 package domain
 
 import (
-	"local/go-infra/pkg/core/events"
-	expectedStreamVersion "local/go-infra/pkg/es/models/stream_version"
+	"github.com/phatnt199/go-infra/pkg/core/events"
+	expectedStreamVersion "github.com/phatnt199/go-infra/pkg/es/models/stream_version"
 
 	uuid "github.com/satori/go.uuid"
 )

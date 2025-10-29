@@ -3,7 +3,7 @@ package messageHeader
 import (
 	"time"
 
-	"local/go-infra/pkg/core/metadata"
+	"github.com/phatnt199/go-infra/pkg/core/metadata"
 )
 
 func GetCorrelationId(m metadata.Metadata) string {

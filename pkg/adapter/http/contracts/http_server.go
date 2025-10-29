@@ -2,8 +2,9 @@ package contracts
 
 import (
 	"context"
-	"local/go-infra/pkg/logger"
 	"net/http"
+
+	"github.com/phatnt199/go-infra/pkg/logger"
 )
 
 // HttpServer defines a framework-agnostic HTTP server interface

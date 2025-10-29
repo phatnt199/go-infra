@@ -3,8 +3,8 @@ package producer
 import (
 	"context"
 
-	"local/go-infra/pkg/core/messaging/types"
-	"local/go-infra/pkg/core/metadata"
+	"github.com/phatnt199/go-infra/pkg/core/messaging/types"
+	"github.com/phatnt199/go-infra/pkg/core/metadata"
 )
 
 type Producer interface {

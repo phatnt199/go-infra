@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"local/go-infra/pkg/reflection/typemapper"
+	"github.com/phatnt199/go-infra/pkg/reflection/typemapper"
 
 	"github.com/brianvoe/gofakeit/v6"
 	uuid "github.com/satori/go.uuid"

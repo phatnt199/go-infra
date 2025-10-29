@@ -1,7 +1,7 @@
 package core
 
 import (
-	"local/go-infra/pkg/core/serializer/json"
+	"github.com/phatnt199/go-infra/pkg/core/serializer/json"
 
 	"go.uber.org/fx"
 )

@@ -1,11 +1,11 @@
 package fxapp
 
 import (
-	"local/go-infra/pkg/adapter/fxapp/contracts"
-	"local/go-infra/pkg/application/environment"
-	"local/go-infra/pkg/logger"
-	loggerConfig "local/go-infra/pkg/logger/config"
-	"local/go-infra/pkg/logger/zap"
+	"github.com/phatnt199/go-infra/pkg/adapter/fxapp/contracts"
+	"github.com/phatnt199/go-infra/pkg/application/environment"
+	"github.com/phatnt199/go-infra/pkg/logger"
+	loggerConfig "github.com/phatnt199/go-infra/pkg/logger/config"
+	"github.com/phatnt199/go-infra/pkg/logger/zap"
 
 	"go.uber.org/fx"
 )

@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	metadata "local/go-infra/pkg/core/metadata"
+	metadata "github.com/phatnt199/go-infra/pkg/core/metadata"
 	mock "github.com/stretchr/testify/mock"
 )
 

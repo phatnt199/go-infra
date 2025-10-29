@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	pipeline "local/go-infra/pkg/core/messaging/pipeline"
+	pipeline "github.com/phatnt199/go-infra/pkg/core/messaging/pipeline"
 
 	mock "github.com/stretchr/testify/mock"
 )

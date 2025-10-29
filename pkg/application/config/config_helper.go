@@ -6,9 +6,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"local/go-infra/pkg/application/constants"
-	"local/go-infra/pkg/application/environment"
-	typeMapper "local/go-infra/pkg/reflection/typemapper"
+	"github.com/phatnt199/go-infra/pkg/application/constants"
+	"github.com/phatnt199/go-infra/pkg/application/environment"
+	typeMapper "github.com/phatnt199/go-infra/pkg/reflection/typemapper"
 
 	"emperror.dev/errors"
 	"github.com/caarlos0/env/v8"

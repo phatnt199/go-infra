@@ -3,8 +3,8 @@
 package mocks
 
 import (
-	domain "local/go-infra/pkg/core/domain"
-	metadata "local/go-infra/pkg/core/metadata"
+	domain "github.com/phatnt199/go-infra/pkg/core/domain"
+	metadata "github.com/phatnt199/go-infra/pkg/core/metadata"
 
 	mock "github.com/stretchr/testify/mock"
 

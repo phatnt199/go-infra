@@ -1,8 +1,9 @@
 package customfiber
 
 import (
-	"local/go-infra/pkg/adapter/http/contracts"
 	"net/http"
+
+	"github.com/phatnt199/go-infra/pkg/adapter/http/contracts"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/adaptor"

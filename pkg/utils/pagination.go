@@ -5,8 +5,8 @@ import (
 	"math"
 	"strconv"
 
-	"local/go-infra/pkg/adapter/http/contracts"
-	"local/go-infra/pkg/mapper"
+	"github.com/phatnt199/go-infra/pkg/adapter/http/contracts"
+	"github.com/phatnt199/go-infra/pkg/mapper"
 
 	"emperror.dev/errors"
 	"github.com/goccy/go-json"

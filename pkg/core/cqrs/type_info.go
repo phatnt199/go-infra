@@ -3,7 +3,7 @@ package cqrs
 import (
 	"reflect"
 
-	"local/go-infra/pkg/reflection/typemapper"
+	"github.com/phatnt199/go-infra/pkg/reflection/typemapper"
 )
 
 type TypeInfo interface {

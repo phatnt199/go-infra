@@ -1,8 +1,8 @@
 package models
 
 import (
-	"local/go-infra/pkg/core/domain"
-	"local/go-infra/pkg/core/metadata"
+	"github.com/phatnt199/go-infra/pkg/core/domain"
+	"github.com/phatnt199/go-infra/pkg/core/metadata"
 
 	uuid "github.com/satori/go.uuid"
 )

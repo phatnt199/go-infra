@@ -3,8 +3,8 @@ package contracts
 import (
 	"context"
 
-	"local/go-infra/pkg/application/environment"
-	"local/go-infra/pkg/logger"
+	"github.com/phatnt199/go-infra/pkg/application/environment"
+	"github.com/phatnt199/go-infra/pkg/logger"
 
 	"go.uber.org/fx"
 )

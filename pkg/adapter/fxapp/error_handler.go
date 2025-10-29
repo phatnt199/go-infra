@@ -1,7 +1,7 @@
 package fxapp
 
 import (
-	"local/go-infra/pkg/logger"
+	"github.com/phatnt199/go-infra/pkg/logger"
 )
 
 type FxErrorHandler struct {

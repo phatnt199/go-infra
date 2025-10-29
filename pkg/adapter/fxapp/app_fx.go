@@ -3,10 +3,10 @@ package fxapp
 import (
 	"time"
 
-	"local/go-infra/pkg/application/config"
-	logConfig "local/go-infra/pkg/logger/config"
-	"local/go-infra/pkg/logger/external/fxlog"
-	"local/go-infra/pkg/logger/zap"
+	"github.com/phatnt199/go-infra/pkg/application/config"
+	logConfig "github.com/phatnt199/go-infra/pkg/logger/config"
+	"github.com/phatnt199/go-infra/pkg/logger/external/fxlog"
+	"github.com/phatnt199/go-infra/pkg/logger/zap"
 
 	"go.uber.org/fx"
 )

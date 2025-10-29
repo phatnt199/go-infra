@@ -1,8 +1,9 @@
 package logger
 
 import (
-	"local/go-infra/pkg/logger/models"
 	"time"
+
+	"github.com/phatnt199/go-infra/pkg/logger/models"
 )
 
 type Fields map[string]interface{}

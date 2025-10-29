@@ -5,7 +5,7 @@ package mocks
 import (
 	context "context"
 
-	models "local/go-infra/pkg/es/models"
+	models "github.com/phatnt199/go-infra/pkg/es/models"
 
 	mock "github.com/stretchr/testify/mock"
 )

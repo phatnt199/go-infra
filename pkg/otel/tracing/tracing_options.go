@@ -1,9 +1,9 @@
 package tracing
 
 import (
-	"local/go-infra/pkg/application/config"
-	"local/go-infra/pkg/application/environment"
-	typeMapper "local/go-infra/pkg/reflection/typemapper"
+	"github.com/phatnt199/go-infra/pkg/application/config"
+	"github.com/phatnt199/go-infra/pkg/application/environment"
+	typeMapper "github.com/phatnt199/go-infra/pkg/reflection/typemapper"
 
 	"github.com/iancoleman/strcase"
 )

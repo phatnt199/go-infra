@@ -3,7 +3,7 @@ package cqrs
 import (
 	"testing"
 
-	"local/go-infra/pkg/reflection/typemapper"
+	"github.com/phatnt199/go-infra/pkg/reflection/typemapper"
 
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"

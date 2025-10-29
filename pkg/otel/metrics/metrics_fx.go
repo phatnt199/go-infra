@@ -3,8 +3,8 @@ package metrics
 import (
 	"context"
 
-	"local/go-infra/pkg/adapter/http/contracts"
-	"local/go-infra/pkg/logger"
+	"github.com/phatnt199/go-infra/pkg/adapter/http/contracts"
+	"github.com/phatnt199/go-infra/pkg/logger"
 
 	"go.opentelemetry.io/contrib/instrumentation/host"
 	"go.opentelemetry.io/otel"

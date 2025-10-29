@@ -2,13 +2,11 @@ package crypto
 
 import (
 	"crypto/rsa"
-	"fmt"
 	"os"
 	"time"
 
+	"emperror.dev/errors"
 	"github.com/golang-jwt/jwt/v5"
-
-	"github.com/phatnt199/go-infra/pkg/errors"
 )
 
 // JWTAlgorithm represents the JWT signing algorithm
@@ -99,18 +97,17 @@ func validateJWTConfig(config *JWTConfig) error {
 	switch config.Algorithm {
 	case AlgorithmHS256, AlgorithmHS384, AlgorithmHS512:
 		if config.Secret == "" {
-			return errors.BadRequest("secret is required for HMAC algorithms")
+			return errors.New("secret is required for HMAC algorithms")
 		}
 	case AlgorithmRS256, AlgorithmRS384, AlgorithmRS512:
 		if config.PrivateKey == nil {
-			return errors.BadRequest("private key is required for RSA algorithms")
+			return errors.New("private key is required for RSA algorithms")
 		}
 		if config.PublicKey == nil {
-			return errors.BadRequest("public key is required for RSA algorithms")
+			return errors.New("public key is required for RSA algorithms")
 		}
 	default:
-		return errors.BadRequest("unsupported JWT algorithm").
-			WithDetails(fmt.Sprintf("algorithm: %s", config.Algorithm))
+		return errors.Errorf("unsupported JWT algorithm: %s", config.Algorithm)
 	}
 
 	return nil
@@ -127,7 +124,7 @@ const (
 // GenerateToken generates a new JWT token
 func (m *JWTManager) GenerateToken(claims *Claims, tokenType TokenType) (string, error) {
 	if claims == nil {
-		return "", errors.BadRequest("claims cannot be nil")
+		return "", errors.New("claims cannot be nil")
 	}
 
 	// Set standard claims
@@ -152,7 +149,7 @@ func (m *JWTManager) GenerateToken(claims *Claims, tokenType TokenType) (string,
 	// Sign token
 	signedToken, err := token.SignedString(m.getSigningKey())
 	if err != nil {
-		return "", errors.Wrap(err, errors.CodeInternal, "failed to sign JWT token")
+		return "", errors.Wrap(err, "failed to sign JWT token")
 	}
 
 	return signedToken, nil
@@ -161,7 +158,7 @@ func (m *JWTManager) GenerateToken(claims *Claims, tokenType TokenType) (string,
 // ParseToken parses and validates a JWT token
 func (m *JWTManager) ParseToken(tokenString string) (*Claims, error) {
 	if tokenString == "" {
-		return nil, errors.BadRequest("token cannot be empty")
+		return nil, errors.New("token cannot be empty")
 	}
 
 	// Parse token
@@ -171,8 +168,7 @@ func (m *JWTManager) ParseToken(tokenString string) (*Claims, error) {
 		func(token *jwt.Token) (interface{}, error) {
 			// Validate algorithm
 			if token.Method.Alg() != string(m.config.Algorithm) {
-				return nil, errors.Unauthorized("invalid token algorithm").
-					WithDetails(fmt.Sprintf("expected %s, got %s", m.config.Algorithm, token.Method.Alg()))
+				return nil, errors.Errorf("invalid token algorithm: expected %s, got %s", m.config.Algorithm, token.Method.Alg())
 			}
 			return m.getVerificationKey(), nil
 		},
@@ -185,12 +181,12 @@ func (m *JWTManager) ParseToken(tokenString string) (*Claims, error) {
 	// Extract claims
 	claims, ok := token.Claims.(*Claims)
 	if !ok || !token.Valid {
-		return nil, errors.Unauthorized("invalid token")
+		return nil, errors.New("invalid token")
 	}
 
 	// Validate issuer
 	if claims.Issuer != m.config.Issuer {
-		return nil, errors.Unauthorized("invalid token issuer")
+		return nil, errors.New("invalid token issuer")
 	}
 
 	// Validate audience
@@ -202,7 +198,7 @@ func (m *JWTManager) ParseToken(tokenString string) (*Claims, error) {
 		}
 	}
 	if !validAudience {
-		return nil, errors.Unauthorized("invalid token audience")
+		return nil, errors.New("invalid token audience")
 	}
 
 	return claims, nil
@@ -301,18 +297,18 @@ func (m *JWTManager) handleParseError(err error) error {
 	errMsg := err.Error()
 
 	if contains(errMsg, "token is expired") || contains(errMsg, "exp") {
-		return errors.New(errors.CodeTokenExpired, "token has expired")
+		return errors.New("token has expired")
 	}
 
 	if contains(errMsg, "not valid yet") || contains(errMsg, "nbf") {
-		return errors.Unauthorized("token is not valid yet")
+		return errors.New("token is not valid yet")
 	}
 
 	if contains(errMsg, "used before issued") || contains(errMsg, "iat") {
-		return errors.Unauthorized("token used before issued")
+		return errors.New("token used before issued")
 	}
 
-	return errors.Wrap(err, errors.CodeInvalidToken, "failed to parse token")
+	return errors.Wrap(err, "failed to parse token")
 }
 
 // contains is a helper function to check if a string contains a substring
@@ -333,12 +329,12 @@ func containsHelper(s, substr string) bool {
 func LoadRSAPrivateKeyFromFile(path string) (*rsa.PrivateKey, error) {
 	keyData, err := os.ReadFile(path)
 	if err != nil {
-		return nil, errors.Wrap(err, errors.CodeInternal, "failed to read private key file")
+		return nil, errors.Wrap(err, "failed to read private key file")
 	}
 
 	key, err := jwt.ParseRSAPrivateKeyFromPEM(keyData)
 	if err != nil {
-		return nil, errors.Wrap(err, errors.CodeInternal, "failed to parse RSA private key")
+		return nil, errors.Wrap(err, "failed to parse RSA private key")
 	}
 
 	return key, nil
@@ -348,12 +344,12 @@ func LoadRSAPrivateKeyFromFile(path string) (*rsa.PrivateKey, error) {
 func LoadRSAPublicKeyFromFile(path string) (*rsa.PublicKey, error) {
 	keyData, err := os.ReadFile(path)
 	if err != nil {
-		return nil, errors.Wrap(err, errors.CodeInternal, "failed to read public key file")
+		return nil, errors.Wrap(err, "failed to read public key file")
 	}
 
 	key, err := jwt.ParseRSAPublicKeyFromPEM(keyData)
 	if err != nil {
-		return nil, errors.Wrap(err, errors.CodeInternal, "failed to parse RSA public key")
+		return nil, errors.Wrap(err, "failed to parse RSA public key")
 	}
 
 	return key, nil
@@ -375,7 +371,7 @@ func InitDefaultJWT(config *JWTConfig) error {
 // GenerateAccessToken generates an access token using default configuration
 func GenerateAccessToken(claims *Claims) (string, error) {
 	if defaultJWTManager == nil {
-		return "", errors.Internal("JWT manager not initialized")
+		return "", errors.New("JWT manager not initialized")
 	}
 	return defaultJWTManager.GenerateToken(claims, AccessToken)
 }
@@ -383,7 +379,7 @@ func GenerateAccessToken(claims *Claims) (string, error) {
 // GenerateRefreshToken generates a refresh token using default configuration
 func GenerateRefreshToken(claims *Claims) (string, error) {
 	if defaultJWTManager == nil {
-		return "", errors.Internal("JWT manager not initialized")
+		return "", errors.New("JWT manager not initialized")
 	}
 	return defaultJWTManager.GenerateToken(claims, RefreshToken)
 }
@@ -391,7 +387,7 @@ func GenerateRefreshToken(claims *Claims) (string, error) {
 // ParseJWT parses a JWT token using default configuration
 func ParseJWT(tokenString string) (*Claims, error) {
 	if defaultJWTManager == nil {
-		return nil, errors.Internal("JWT manager not initialized")
+		return nil, errors.New("JWT manager not initialized")
 	}
 	return defaultJWTManager.ParseToken(tokenString)
 }
@@ -399,7 +395,7 @@ func ParseJWT(tokenString string) (*Claims, error) {
 // ValidateJWT validates a JWT token using default configuration
 func ValidateJWT(tokenString string) error {
 	if defaultJWTManager == nil {
-		return errors.Internal("JWT manager not initialized")
+		return errors.New("JWT manager not initialized")
 	}
 	return defaultJWTManager.ValidateToken(tokenString)
 }

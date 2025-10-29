@@ -10,7 +10,8 @@ All new features, bug fixes, and changes should be developed in a feature branch
 
 Create a new branch from the `main` branch. Use a descriptive name, like:
 
-- `feature/add-new-component`
+- `feat/add-new-component`
+- `refactor/refactor-component`
 - `fix/resolve-memory-leak`
 - `docs/update-readme`
 

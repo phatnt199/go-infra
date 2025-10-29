@@ -1,4 +1,4 @@
-module local/go-infra
+module github.com/phatnt199/go-infra
 
 go 1.25.3
 

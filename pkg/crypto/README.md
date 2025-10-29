@@ -45,7 +45,7 @@ The `crypto` package provides production-ready cryptographic utilities for passw
 The crypto package is part of `go-infra`. Import it in your project:
 
 ```go
-import "local/go-infra/pkg/crypto"
+import "github.com/phatnt199/go-infra/pkg/crypto"
 ```
 
 Required dependencies (already included):
@@ -64,7 +64,7 @@ package main
 
 import (
     "fmt"
-    "local/go-infra/pkg/crypto"
+    "github.com/phatnt199/go-infra/pkg/crypto"
 )
 
 func main() {
@@ -94,7 +94,7 @@ package main
 import (
     "fmt"
     "time"
-    "local/go-infra/pkg/crypto"
+    "github.com/phatnt199/go-infra/pkg/crypto"
 )
 
 func main() {
@@ -138,7 +138,7 @@ package main
 
 import (
     "fmt"
-    "local/go-infra/pkg/crypto"
+    "github.com/phatnt199/go-infra/pkg/crypto"
 )
 
 func main() {
@@ -636,8 +636,8 @@ The crypto package integrates seamlessly with the config package:
 
 ```go
 import (
-    "local/go-infra/pkg/application/config"
-    "local/go-infra/pkg/crypto"
+    "github.com/phatnt199/go-infra/pkg/application/config"
+    "github.com/phatnt199/go-infra/pkg/crypto"
 )
 
 // Load configuration
@@ -678,7 +678,7 @@ See the complete examples in:
 The crypto package uses the `pkg/errors` package for consistent error handling:
 
 ```go
-import "local/go-infra/pkg/errors"
+import "github.com/phatnt199/go-infra/pkg/errors"
 
 // Check for specific error codes
 if err != nil {

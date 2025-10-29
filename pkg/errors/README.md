@@ -62,7 +62,7 @@ This package is built to teach you core Go concepts:
 ### 1. Basic Error Creation
 
 ```go
-import "local/go-infra/pkg/errors"
+import "github.com/phatnt199/go-infra/pkg/errors"
 
 // Simple errors
 err := errors.NotFound("User")
@@ -336,8 +336,8 @@ Now that you understand error handling, you can:
 4. Try breaking things to understand error cases
 5. Use `go doc` to read documentation:
    ```bash
-   go doc local/go-infra/pkg/errors
-   go doc local/go-infra/pkg/errors.New
+   go doc github.com/phatnt199/go-infra/pkg/errors
+   go doc github.com/phatnt199/go-infra/pkg/errors.New
    ```
 
 ## 🤝 Contributing

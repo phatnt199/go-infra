@@ -59,9 +59,9 @@ package main
 
 import (
     "context"
-    "local/go-infra/pkg/application/config"
-    "local/go-infra/pkg/infra/postgres"
-    "local/go-infra/pkg/logger"
+    "github.com/phatnt199/go-infra/pkg/application/config"
+    "github.com/phatnt199/go-infra/pkg/infra/postgres"
+    "github.com/phatnt199/go-infra/pkg/logger"
 )
 
 func main() {

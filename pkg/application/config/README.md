@@ -18,7 +18,7 @@ A comprehensive, production-ready configuration management package for Go applic
 
 ```bash
 # In your project that uses go-infra
-import "local/go-infra/pkg/application/config"
+import "github.com/phatnt199/go-infra/pkg/application/config"
 ```
 
 ## Quick Start
@@ -56,7 +56,7 @@ package main
 
 import (
     "log"
-    "local/go-infra/pkg/application/config"
+    "github.com/phatnt199/go-infra/pkg/application/config"
 )
 
 func main() {
@@ -464,7 +464,7 @@ package main
 
 import (
     "log"
-    "local/go-infra/pkg/application/config"
+    "github.com/phatnt199/go-infra/pkg/application/config"
 )
 
 func main() {
@@ -495,7 +495,7 @@ globalCfg := config.Get()
 ```go
 import (
     "net/http"
-    "local/go-infra/pkg/application/config"
+    "github.com/phatnt199/go-infra/pkg/application/config"
 )
 
 func main() {
@@ -518,7 +518,7 @@ func main() {
 import (
     "database/sql"
     _ "github.com/lib/pq"
-    "local/go-infra/pkg/application/config"
+    "github.com/phatnt199/go-infra/pkg/application/config"
 )
 
 func main() {
@@ -640,7 +640,7 @@ if err != nil {
 ```go
 import (
     "testing"
-    "local/go-infra/pkg/application/config"
+    "github.com/phatnt199/go-infra/pkg/application/config"
 )
 
 func TestSomething(t *testing.T) {
@@ -690,8 +690,8 @@ func TestWithEnv(t *testing.T) {
 
 ```go
 import (
-    "local/go-infra/pkg/application/config"
-    "local/go-infra/pkg/logger"
+    "github.com/phatnt199/go-infra/pkg/application/config"
+    "github.com/phatnt199/go-infra/pkg/logger"
 )
 
 func main() {

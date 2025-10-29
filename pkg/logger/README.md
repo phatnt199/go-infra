@@ -20,7 +20,7 @@ A production-ready, high-performance structured logging package for Go applicati
 package main
 
 import (
-    "local/go-infra/pkg/logger"
+    "github.com/phatnt199/go-infra/pkg/logger"
 )
 
 func main() {
@@ -39,7 +39,7 @@ func main() {
 package main
 
 import (
-    "local/go-infra/pkg/logger"
+    "github.com/phatnt199/go-infra/pkg/logger"
 )
 
 func main() {
@@ -123,7 +123,7 @@ config := logger.DefaultConfig()
 All field types are provided by `go-infra/pkg/logger` - **no need to import anything else**:
 
 ```go
-import "local/go-infra/pkg/logger"
+import "github.com/phatnt199/go-infra/pkg/logger"
 
 // String fields
 logger.String("key", "value")
@@ -153,7 +153,7 @@ logger.Any("data", complexStruct)
 
 ```go
 import (
-    "local/go-infra/pkg/logger"
+    "github.com/phatnt199/go-infra/pkg/logger"
     "time"
 )
 
@@ -216,7 +216,7 @@ userAuthLogger.Info("Password verified")
 ```go
 import (
     "context"
-    "local/go-infra/pkg/logger"
+    "github.com/phatnt199/go-infra/pkg/logger"
 )
 
 func HandleRequest(w http.ResponseWriter, r *http.Request) {
@@ -248,7 +248,7 @@ func ProcessOrder(ctx context.Context) {
 ```go
 import (
     "errors"
-    "local/go-infra/pkg/logger"
+    "github.com/phatnt199/go-infra/pkg/logger"
 )
 
 func FetchUser(id int) error {
@@ -424,8 +424,8 @@ The logger integrates seamlessly with `go-infra/pkg/errors`:
 
 ```go
 import (
-    "local/go-infra/pkg/errors"
-    "local/go-infra/pkg/logger"
+    "github.com/phatnt199/go-infra/pkg/errors"
+    "github.com/phatnt199/go-infra/pkg/logger"
 )
 
 func GetUser(id int) error {
@@ -467,7 +467,7 @@ import (
     "net/http"
     "time"
 
-    "local/go-infra/pkg/logger"
+    "github.com/phatnt199/go-infra/pkg/logger"
 )
 
 func main() {
@@ -561,13 +561,13 @@ go run examples/integration_example/main.go
 
 ```bash
 # View package docs
-go doc local/go-infra/pkg/logger
+go doc github.com/phatnt199/go-infra/pkg/logger
 
 # View specific function
-go doc local/go-infra/pkg/logger.New
+go doc github.com/phatnt199/go-infra/pkg/logger.New
 
 # View all documentation
-go doc -all local/go-infra/pkg/logger
+go doc -all github.com/phatnt199/go-infra/pkg/logger
 ```
 
 ## 💡 Why This Approach?
@@ -586,9 +586,9 @@ go doc -all local/go-infra/pkg/logger
 ```
 ┌─────────────────────────────────────────┐
 │  Your Application                        │
-│  ├── import "local/go-infra/pkg/logger" │
-│  ├── import "local/go-infra/pkg/errors" │
-│  └── import "local/go-infra/pkg/config" │
+│  ├── import "github.com/phatnt199/go-infra/pkg/logger" │
+│  ├── import "github.com/phatnt199/go-infra/pkg/errors" │
+│  └── import "github.com/phatnt199/go-infra/pkg/config" │
 │                                          │
 │  NO external imports needed!             │
 └─────────────────────────────────────────┘

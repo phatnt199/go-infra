@@ -26,10 +26,10 @@ go-infra is a battle-tested, modular infrastructure framework that provides ever
 
 ```bash
 # Add to your go.mod
-require local/go-infra v0.0.0
+require github.com/phatnt199/go-infra v0.0.0
 
 # For local development
-replace local/go-infra => /path/to/go-infra
+replace github.com/phatnt199/go-infra => /path/to/go-infra
 ```
 
 ### Build Your First API (60 seconds)
@@ -38,11 +38,11 @@ replace local/go-infra => /path/to/go-infra
 package main
 
 import (
-    "local/go-infra/pkg/adapter/http/crud"
-    "local/go-infra/pkg/adapter/http/fiber"
-    "local/go-infra/pkg/domain/entity"
-    "local/go-infra/pkg/infra/postgres"
-    "local/go-infra/pkg/logger"
+    "github.com/phatnt199/go-infra/pkg/adapter/http/crud"
+    "github.com/phatnt199/go-infra/pkg/adapter/http/fiber"
+    "github.com/phatnt199/go-infra/pkg/domain/entity"
+    "github.com/phatnt199/go-infra/pkg/infra/postgres"
+    "github.com/phatnt199/go-infra/pkg/logger"
 )
 
 type User struct {
@@ -110,4 +110,5 @@ go run examples/utils_example/main.go
 ## License
 
 MIT License - Built with ❤️ for the Go community
+
 # go-infra

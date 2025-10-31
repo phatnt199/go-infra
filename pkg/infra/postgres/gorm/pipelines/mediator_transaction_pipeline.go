@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/phatnt199/go-infra/pkg/core/cqrs"
-	"github.com/phatnt199/go-infra/pkg/infra/postgres/gorm/helpers/extensions"
+	gormextensions "github.com/phatnt199/go-infra/pkg/infra/postgres/gorm/helpers/extensions"
 	"github.com/phatnt199/go-infra/pkg/logger"
 	typeMapper "github.com/phatnt199/go-infra/pkg/reflection/typemapper"
 
@@ -58,11 +58,11 @@ func (m *mediatorTransactionPipeline) Handle(
 
 			if err, _ := r.(error); err != nil {
 				m.logger.Errorf(
-					"panic tn the transaction, rolling back transaction with panic err: %+v",
+					"panic in the transaction, rolling back transaction with panic err: %+v",
 					err,
 				)
 			} else {
-				m.logger.Errorf("panic tn the transaction, rolling back transaction with panic message: %+v", r)
+				m.logger.Errorf("panic in the transaction, rolling back transaction with panic message: %+v", r)
 			}
 		}
 	}()

@@ -675,18 +675,16 @@ See the complete examples in:
 
 ## Error Handling
 
-The crypto package uses the `pkg/errors` package for consistent error handling:
+The crypto package uses `emperror.dev/errors` for consistent error handling:
 
 ```go
-import "github.com/phatnt199/go-infra/pkg/errors"
+import "emperror.dev/errors"
 
-// Check for specific error codes
+// All errors are wrapped with context
+hash, err := hasher.HashPassword("", crypto.AlgorithmBcrypt)
 if err != nil {
-    if errors.Is(err, errors.CodeTokenExpired) {
-        // Handle expired token
-    } else if errors.Is(err, errors.CodeInvalidToken) {
-        // Handle invalid token
-    }
+    // Error: "password cannot be empty"
+    log.Println(err)
 }
 ```
 

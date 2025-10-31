@@ -9,13 +9,17 @@ import (
 )
 
 // Context represents a framework-agnostic HTTP context
-// Both Echo and Fiber adapters will implement this interface
+// Implements common functionality across Echo, Fiber, and Gin frameworks
 type Context interface {
+	// ===== Request Methods =====
+
 	// Request returns the HTTP request
 	Request() *http.Request
 
 	// Response returns a response writer interface
 	ResponseWriter() http.ResponseWriter
+
+	// ===== Path & Query Parameters =====
 
 	// Param returns path parameter by name
 	Param(name string) string
@@ -26,6 +30,8 @@ type Context interface {
 	// QueryParams returns the query parameters as url.Values
 	QueryParams() url.Values
 
+	// ===== Form Data & File Uploads =====
+
 	// FormValue returns the form field value by name
 	FormValue(name string) string
 
@@ -35,11 +41,15 @@ type Context interface {
 	// MultipartForm returns the multipart form
 	MultipartForm() (*multipart.Form, error)
 
+	// ===== Context Storage =====
+
 	// Get retrieves data from the context
 	Get(key string) interface{}
 
 	// Set saves data in the context
 	Set(key string, val interface{})
+
+	// ===== Request Body =====
 
 	// Bind binds the request body into provided type
 	// Supports JSON, XML, form data based on Content-Type
@@ -47,6 +57,11 @@ type Context interface {
 
 	// Validate validates provided struct
 	Validate(i interface{}) error
+
+	// Body returns the raw request body
+	Body() []byte
+
+	// ===== Response Methods =====
 
 	// JSON sends a JSON response with status code
 	JSON(code int, i interface{}) error
@@ -75,8 +90,56 @@ type Context interface {
 	// Redirect redirects the request to a provided URL with status code
 	Redirect(code int, url string) error
 
+	// ===== File Downloads =====
+
+	// File sends a file as response
+	File(filepath string) error
+
+	// Attachment sends a file as an attachment (triggers download)
+	Attachment(filepath, filename string) error
+
+	// ===== Headers =====
+
+	// GetHeader returns the request header value for the given key
+	GetHeader(key string) string
+
+	// SetHeader sets a response header
+	SetHeader(key, value string)
+
+	// ===== Cookies =====
+
+	// Cookie returns the named cookie from the request
+	Cookie(name string) (*http.Cookie, error)
+
+	// SetCookie adds a Set-Cookie header to the response
+	SetCookie(cookie *http.Cookie)
+
+	// Cookies returns all cookies from the request
+	Cookies() []*http.Cookie
+
+	// ===== Content Negotiation =====
+
+	// Accepts returns the best match from the offered content types
+	// Returns empty string if no match is found
+	Accepts(offers ...string) string
+
+	// ContentType returns the Content-Type header of the request
+	ContentType() string
+
+	// ===== Status =====
+
+	// Status sets the HTTP status code (for chaining)
+	Status(code int) Context
+
+	// GetStatus returns the current HTTP status code
+	GetStatus() int
+
+	// ===== Error Handling =====
+
 	// Error invokes the registered error handler
 	Error(err error)
+
+	// ===== Handler & Metadata =====
 
 	// Handler returns the matched handler by router
 	Handler() interface{}

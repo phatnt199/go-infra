@@ -420,11 +420,11 @@ if err != nil {
 
 ## 🔗 Integration with Error Package
 
-The logger integrates seamlessly with `go-infra/pkg/errors`:
+The logger integrates seamlessly with `emperror.dev/errors`:
 
 ```go
 import (
-    "github.com/phatnt199/go-infra/pkg/errors"
+    "emperror.dev/errors"
     "github.com/phatnt199/go-infra/pkg/logger"
 )
 
@@ -432,7 +432,7 @@ func GetUser(id int) error {
     user, err := db.FindUser(id)
     if err != nil {
         // Create structured error
-        appErr := errors.Wrap(err, errors.CodeDatabaseError, "Failed to fetch user")
+        appErr := errors.Wrap(err, "Failed to fetch user")
 
         // Log with error context
         logger.Error("Database operation failed",
@@ -587,10 +587,10 @@ go doc -all github.com/phatnt199/go-infra/pkg/logger
 ┌─────────────────────────────────────────┐
 │  Your Application                        │
 │  ├── import "github.com/phatnt199/go-infra/pkg/logger" │
-│  ├── import "github.com/phatnt199/go-infra/pkg/errors" │
+│  ├── import "emperror.dev/errors"        │
 │  └── import "github.com/phatnt199/go-infra/pkg/config" │
 │                                          │
-│  NO external imports needed!             │
+│  Use standard patterns with go-infra!    │
 └─────────────────────────────────────────┘
 ```
 

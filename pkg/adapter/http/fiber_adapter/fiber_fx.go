@@ -9,8 +9,28 @@ import (
 	"github.com/phatnt199/go-infra/pkg/adapter/http/fiber_adapter/config"
 	"github.com/phatnt199/go-infra/pkg/logger"
 
+	"go.opentelemetry.io/otel/metric"
+	"go.opentelemetry.io/otel/metric/noop"
 	"go.uber.org/fx"
 )
+
+// FiberHttpServerParams contains the parameters for NewFiberHttpServer with optional meter
+type FiberHttpServerParams struct {
+	fx.In
+
+	Cfg    *config.FiberHttpOptions
+	Logger logger.Logger
+	Meter  metric.Meter `optional:"true"`
+}
+
+// ProvideFiberServer creates the HTTP server with fallback to noop meter if not provided
+func ProvideFiberServer(params FiberHttpServerParams) contracts.HttpServer {
+	// Use noop meter if not provided (when metrics module is not loaded)
+	if params.Meter == nil {
+		params.Meter = noop.MeterProvider{}.Meter("")
+	}
+	return NewFiberHttpServer(params.Cfg, params.Logger, params.Meter)
+}
 
 var (
 	// Module provides Fiber HTTP server using fx dependency injection
@@ -24,7 +44,7 @@ var (
 		fx.Provide(
 			config.ProvideConfig,
 			fx.Annotate(
-				NewFiberHttpServer,
+				ProvideFiberServer,
 				fx.As(new(contracts.HttpServer)),
 			),
 		),

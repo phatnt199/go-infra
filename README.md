@@ -12,10 +12,8 @@ go-infra is a battle-tested, modular infrastructure framework that provides ever
 ### ✨ Key Features
 
 - 🎯 **Zero-Boilerplate CRUD** - Build REST APIs in minutes with automatic CRUD generation
-- 🛡️ **Production-Ready Error Handling** - 30+ error codes with automatic HTTP mapping
-- 📝 **Structured Logging** - High-performance logging with context propagation
+- **Structured Logging** - High-performance logging with context propagation
 - 🔐 **Security Built-in** - Password hashing, JWT, AES encryption
-- 🗄️ **Database Integration** - PostgreSQL with GORM, migrations, transactions
 - 🧰 **Rich Utilities** - 117+ utility functions for common tasks
 - ⚙️ **Configuration Management** - Environment-based config with validation
 - 🔄 **Type-Safe** - Leverages Go generics for type safety
@@ -41,8 +39,9 @@ import (
     "github.com/phatnt199/go-infra/pkg/adapter/http/crud"
     "github.com/phatnt199/go-infra/pkg/adapter/http/fiber"
     "github.com/phatnt199/go-infra/pkg/domain/entity"
-    "github.com/phatnt199/go-infra/pkg/infra/postgres"
     "github.com/phatnt199/go-infra/pkg/logger"
+    "gorm.io/driver/postgres"
+    "gorm.io/gorm"
 )
 
 type User struct {
@@ -53,10 +52,10 @@ type User struct {
 
 func main() {
     logger.Init()
-    db, _ := postgres.Connect(&postgres.Config{
-        Host: "localhost", Port: 5432, User: "postgres",
-        Password: "postgres", Database: "myapp",
-    })
+
+    // Setup your own GORM database connection
+    dsn := "host=localhost user=postgres password=postgres dbname=myapp port=5432 sslmode=disable"
+    db, _ := gorm.Open(postgres.Open(dsn), &gorm.Config{})
     db.AutoMigrate(&User{})
 
     app, router := fiber.New()
@@ -78,22 +77,21 @@ func main() {
 
 - [Quick Start Guide](./docs/01-QUICK-START.md) - Get running in 5 minutes
 - [CRUD System](./docs/crud/CRUD-QUICK-START.md) - Build APIs fast
-- [Error Handling](./docs/packages/ERRORS.md) - Production-ready errors
 - [All Examples](./examples/) - Working code examples
 
 ## What's Included
 
 ### Core Packages
 
-| Package      | Description           | Key Features                               |
-| ------------ | --------------------- | ------------------------------------------ |
-| **errors**   | Error handling system | 30+ codes, HTTP mapping, context tracking  |
-| **logger**   | Structured logging    | Zap-based, type-safe, high-performance     |
-| **crypto**   | Security utilities    | Password hashing, JWT, AES encryption      |
-| **utils**    | Common utilities      | 117+ functions for everyday tasks          |
-| **config**   | Configuration         | Environment-based, validated               |
-| **postgres** | Database client       | GORM integration, migrations, transactions |
-| **crud**     | Auto CRUD APIs        | Zero-boilerplate REST endpoints            |
+| Package    | Description        | Key Features                           |
+| ---------- | ------------------ | -------------------------------------- |
+| **logger** | Structured logging | Zap-based, type-safe, high-performance |
+| **crypto** | Security utilities | Password hashing, JWT, AES encryption  |
+| **utils**  | Common utilities   | 117+ functions for everyday tasks      |
+| **config** | Configuration      | Environment-based, validated           |
+| **crud**   | Auto CRUD APIs     | Zero-boilerplate REST endpoints        |
+
+> **Note:** This framework now uses `emperror.dev/errors` for error handling. The custom errors package has been removed. For database setup, you can now configure GORM directly as shown in the examples above.
 
 ## Examples
 

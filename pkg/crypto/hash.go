@@ -6,10 +6,9 @@ import (
 	"encoding/base64"
 	"fmt"
 
+	"emperror.dev/errors"
 	"golang.org/x/crypto/argon2"
 	"golang.org/x/crypto/bcrypt"
-
-	"github.com/phatnt199/go-infra/pkg/errors"
 )
 
 // HashAlgorithm represents the hashing algorithm type
@@ -64,7 +63,7 @@ func NewHasher(config *HashConfig) *Hasher {
 // HashPassword hashes a password using the specified algorithm
 func (h *Hasher) HashPassword(password string, algorithm HashAlgorithm) (string, error) {
 	if password == "" {
-		return "", errors.BadRequest("password cannot be empty")
+		return "", errors.New("password cannot be empty")
 	}
 
 	switch algorithm {
@@ -73,15 +72,14 @@ func (h *Hasher) HashPassword(password string, algorithm HashAlgorithm) (string,
 	case AlgorithmArgon2:
 		return h.hashArgon2(password)
 	default:
-		return "", errors.BadRequest("unsupported hashing algorithm").
-			WithDetails(fmt.Sprintf("algorithm: %s", algorithm))
+		return "", errors.Errorf("unsupported hashing algorithm: %s", algorithm)
 	}
 }
 
 // ComparePassword compares a password with a hash
 func (h *Hasher) ComparePassword(password, hash string) (bool, error) {
 	if password == "" || hash == "" {
-		return false, errors.BadRequest("password and hash cannot be empty")
+		return false, errors.New("password and hash cannot be empty")
 	}
 
 	// Try to detect the algorithm from the hash format
@@ -98,7 +96,7 @@ func (h *Hasher) ComparePassword(password, hash string) (bool, error) {
 func (h *Hasher) hashBcrypt(password string) (string, error) {
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), h.config.BcryptCost)
 	if err != nil {
-		return "", errors.Wrap(err, errors.CodeInternal, "failed to hash password with bcrypt")
+		return "", errors.Wrap(err, "failed to hash password with bcrypt")
 	}
 	return string(hash), nil
 }
@@ -110,7 +108,7 @@ func (h *Hasher) compareBcrypt(password, hash string) (bool, error) {
 		if err == bcrypt.ErrMismatchedHashAndPassword {
 			return false, nil
 		}
-		return false, errors.Wrap(err, errors.CodeInternal, "failed to compare bcrypt hash")
+		return false, errors.Wrap(err, "failed to compare bcrypt hash")
 	}
 	return true, nil
 }
@@ -120,7 +118,7 @@ func (h *Hasher) hashArgon2(password string) (string, error) {
 	// Generate a random salt
 	salt := make([]byte, h.config.Argon2SaltLen)
 	if _, err := rand.Read(salt); err != nil {
-		return "", errors.Wrap(err, errors.CodeInternal, "failed to generate salt")
+		return "", errors.Wrap(err, "failed to generate salt")
 	}
 
 	// Generate the hash
@@ -154,37 +152,37 @@ func (h *Hasher) compareArgon2(password, encodedHash string) (bool, error) {
 	// Format: $argon2id$v=19$m=65536,t=1,p=4$salt$hash
 	parts := splitArgon2Hash(encodedHash)
 	if len(parts) != 6 {
-		return false, errors.BadRequest("invalid argon2 hash format")
+		return false, errors.New("invalid argon2 hash format")
 	}
 
 	// parts[0] is empty (before first $)
 	// parts[1] should be "argon2id"
 	if parts[1] != "argon2id" {
-		return false, errors.BadRequest("unsupported argon2 variant")
+		return false, errors.New("unsupported argon2 variant")
 	}
 
 	// Parse version
 	var version int
 	if _, err := fmt.Sscanf(parts[2], "v=%d", &version); err != nil {
-		return false, errors.Wrap(err, errors.CodeInternal, "failed to parse version")
+		return false, errors.Wrap(err, "failed to parse version")
 	}
 
 	// Parse parameters
 	var memory, time uint32
 	var threads uint8
 	if _, err := fmt.Sscanf(parts[3], "m=%d,t=%d,p=%d", &memory, &time, &threads); err != nil {
-		return false, errors.Wrap(err, errors.CodeInternal, "failed to parse parameters")
+		return false, errors.Wrap(err, "failed to parse parameters")
 	}
 
 	// Decode salt and hash
 	decodedSalt, err := base64.RawStdEncoding.DecodeString(parts[4])
 	if err != nil {
-		return false, errors.Wrap(err, errors.CodeInternal, "failed to decode salt")
+		return false, errors.Wrap(err, "failed to decode salt")
 	}
 
 	decodedHash, err := base64.RawStdEncoding.DecodeString(parts[5])
 	if err != nil {
-		return false, errors.Wrap(err, errors.CodeInternal, "failed to decode hash")
+		return false, errors.Wrap(err, "failed to decode hash")
 	}
 
 	// Generate hash from the password with the same parameters

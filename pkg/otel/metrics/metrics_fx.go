@@ -12,6 +12,23 @@ import (
 	"go.uber.org/fx"
 )
 
+// RegisterMetricsEndpointParams contains optional parameters for registering metrics endpoint
+type RegisterMetricsEndpointParams struct {
+	fx.In
+
+	Metrics *OtelMetrics         `optional:"true"`
+	Server  contracts.HttpServer `optional:"true"`
+}
+
+// RegisterHooksParams contains optional parameters for lifecycle hooks
+type RegisterHooksParams struct {
+	fx.In
+
+	Lifecycle fx.Lifecycle
+	Metrics   *OtelMetrics `optional:"true"`
+	Logger    logger.Logger
+}
+
 var (
 	// Module provided to fxlog
 	// https://uber-go.github.io/fx/modules.html
@@ -32,9 +49,17 @@ var (
 	))
 
 	metricsInvokes = fx.Options( //nolint:gochecknoglobals
-		fx.Invoke(registerHooks),
-		fx.Invoke(func(m *OtelMetrics, server contracts.HttpServer) {
-			m.RegisterMetricsEndpoint(server)
+		fx.Invoke(func(params RegisterHooksParams) {
+			// Only register hooks if metrics is available
+			if params.Metrics != nil {
+				registerHooks(params.Lifecycle, params.Metrics, params.Logger)
+			}
+		}),
+		fx.Invoke(func(params RegisterMetricsEndpointParams) {
+			// Only register endpoint if both metrics and server are available
+			if params.Metrics != nil && params.Server != nil {
+				params.Metrics.RegisterMetricsEndpoint(params.Server)
+			}
 		}),
 	)
 )

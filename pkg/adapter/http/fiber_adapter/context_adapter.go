@@ -85,6 +85,10 @@ func (f *fiberContextAdapter) Validate(i interface{}) error {
 	return nil
 }
 
+func (f *fiberContextAdapter) Body() []byte {
+	return f.ctx.Body()
+}
+
 func (f *fiberContextAdapter) JSON(code int, i interface{}) error {
 	return f.ctx.Status(code).JSON(i)
 }
@@ -128,6 +132,88 @@ func (f *fiberContextAdapter) NoContent(code int) error {
 
 func (f *fiberContextAdapter) Redirect(code int, url string) error {
 	return f.ctx.Redirect(url, code)
+}
+
+func (f *fiberContextAdapter) File(filepath string) error {
+	return f.ctx.SendFile(filepath)
+}
+
+func (f *fiberContextAdapter) Attachment(filepath, filename string) error {
+	if filename != "" {
+		f.ctx.Set(fiber.HeaderContentDisposition, `attachment; filename="`+filename+`"`)
+	}
+	return f.ctx.SendFile(filepath)
+}
+
+func (f *fiberContextAdapter) GetHeader(key string) string {
+	return f.ctx.Get(key)
+}
+
+func (f *fiberContextAdapter) SetHeader(key, value string) {
+	f.ctx.Set(key, value)
+}
+
+func (f *fiberContextAdapter) Cookie(name string) (*http.Cookie, error) {
+	value := f.ctx.Cookies(name)
+	if value == "" {
+		return nil, http.ErrNoCookie
+	}
+	return &http.Cookie{
+		Name:  name,
+		Value: value,
+	}, nil
+}
+
+func (f *fiberContextAdapter) SetCookie(cookie *http.Cookie) {
+	// Convert http.SameSite to fiber.Cookie SameSite
+	var sameSite string
+	switch cookie.SameSite {
+	case http.SameSiteDefaultMode:
+		sameSite = "lax"
+	case http.SameSiteLaxMode:
+		sameSite = "lax"
+	case http.SameSiteStrictMode:
+		sameSite = "strict"
+	case http.SameSiteNoneMode:
+		sameSite = "none"
+	default:
+		sameSite = "lax"
+	}
+
+	f.ctx.Cookie(&fiber.Cookie{
+		Name:     cookie.Name,
+		Value:    cookie.Value,
+		Path:     cookie.Path,
+		Domain:   cookie.Domain,
+		MaxAge:   cookie.MaxAge,
+		Expires:  cookie.Expires,
+		Secure:   cookie.Secure,
+		HTTPOnly: cookie.HttpOnly,
+		SameSite: sameSite,
+	})
+}
+
+func (f *fiberContextAdapter) Cookies() []*http.Cookie {
+	// Fiber doesn't provide direct access to all cookies
+	// This is a simplified implementation
+	return nil
+}
+
+func (f *fiberContextAdapter) Accepts(offers ...string) string {
+	return f.ctx.Accepts(offers...)
+}
+
+func (f *fiberContextAdapter) ContentType() string {
+	return f.ctx.Get(fiber.HeaderContentType)
+}
+
+func (f *fiberContextAdapter) Status(code int) contracts.Context {
+	f.ctx.Status(code)
+	return f
+}
+
+func (f *fiberContextAdapter) GetStatus() int {
+	return f.ctx.Response().StatusCode()
 }
 
 func (f *fiberContextAdapter) Error(err error) {

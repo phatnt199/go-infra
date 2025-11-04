@@ -43,6 +43,11 @@ func (m *goosePostgresMigrator) Down(_ context.Context, version uint) error {
 	return err
 }
 
+func (m *goosePostgresMigrator) Version(_ context.Context) (uint, bool, error) {
+	version, err := goose.GetDBVersion(m.db)
+	return uint(version), false, err // goose doesn't have dirty flag like golang-migrate
+}
+
 func (m *goosePostgresMigrator) executeCommand(
 	command migration.CommandType,
 	version uint,

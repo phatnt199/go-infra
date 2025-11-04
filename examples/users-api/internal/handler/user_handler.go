@@ -41,7 +41,7 @@ func (h *UserHandler) GetAllUsers(c contracts.Context) error {
 		})
 		return c.JSON(500, ErrorResponse{
 			Error:   "Failed to fetch users",
-			Message: err.Error(),
+			Message: "An internal error occurred. Please try again later.",
 		})
 	}
 

@@ -168,7 +168,7 @@ func (h *UserHandler) CreateUser(c contracts.Context) error {
 		})
 		return c.JSON(500, ErrorResponse{
 			Error:   "Failed to create user",
-			Message: err.Error(),
+			Message: "An internal error occurred. Please try again later.",
 		})
 	}
 

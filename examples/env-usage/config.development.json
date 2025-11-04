@@ -1,0 +1,26 @@
+{
+  "fiberHttpOptions": {
+    "port": ":8080",
+    "host": "localhost",
+    "basePath": "/api/v1",
+    "name": "ENV Usage Example",
+    "development": true,
+    "timeout": 30
+  },
+  "gormOptions": {
+    "type": 0,
+    "host": "localhost",
+    "port": 5432,
+    "user": "admin",
+    "password": "123456",
+    "dbname": "go-sandbox",
+    "sslmode": false,
+    "enable_tracing": false
+  },
+  "logOptions": {
+    "level": "info",
+    "logType": 0,
+    "callerEnabled": true,
+    "enableTracing": true
+  }
+}

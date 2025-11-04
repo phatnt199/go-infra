@@ -44,7 +44,7 @@ func main() {
 	// Example D: load users-api fiber HTTP options from example project's config.development.json
 	fmt.Println("\n--- Example D: load Users API Fiber options from config.development.json ---")
 	// We explicitly request the Development environment so the loader searches for config.development.json
-	fiberOptions, err := fibercfg.ProvideConfig(environment.Production)
+	fiberOptions, err := fibercfg.ProvideConfig(environment.Development)
 	if err != nil {
 		fmt.Printf("failed to load fiber config: %v\n", err)
 	} else {

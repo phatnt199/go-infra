@@ -91,7 +91,7 @@ func (m *goMigratePostgresMigrator) Down(_ context.Context, version uint) error 
 		return nil
 	}
 
-	err := m.executeCommand(migration.Up, version)
+	err := m.executeCommand(migration.Down, version)
 
 	if errors.Is(err, migrate.ErrNoChange) {
 		return nil
@@ -104,6 +104,10 @@ func (m *goMigratePostgresMigrator) Down(_ context.Context, version uint) error 
 	m.logger.Info("migration finished")
 
 	return nil
+}
+
+func (m *goMigratePostgresMigrator) Version(_ context.Context) (uint, bool, error) {
+	return m.migration.Version()
 }
 
 func (m *goMigratePostgresMigrator) executeCommand(command migration.CommandType, version uint) error {
@@ -119,7 +123,11 @@ func (m *goMigratePostgresMigrator) executeCommand(command migration.CommandType
 		if version == 0 {
 			err = m.migration.Down()
 		} else {
-			err = m.migration.Migrate(version)
+			// For version-specific down, we need to go back to version 0 and then forward to version-1
+			// However, the migrate library's Down() goes back one step
+			// So we call Down() multiple times or use a different approach
+			// Actually, for down migrations with version, we should go to version-1
+			err = m.migration.Migrate(version - 1)
 		}
 	default:
 		err = errors.New("invalid migration direction")

@@ -24,10 +24,14 @@ func NewApplicationBuilder(environments ...environment.Environment) contracts.Ap
 	var logger logger.Logger
 	logoption, err := loggerConfig.ProvideLogConfig(env)
 	if err != nil || logoption == nil {
-		logger = zap.NewZapLogger(logoption, env)
-	} else {
-		logger = zap.NewZapLogger(logoption, env)
+		// Provide a default logger config if none is available
+		logoption = &loggerConfig.LogOptions{
+			LogLevel:      "info",
+			CallerEnabled: true,
+			EnableTracing: true,
+		}
 	}
+	logger = zap.NewZapLogger(logoption, env)
 
 	return &applicationBuilder{logger: logger, environment: env}
 }

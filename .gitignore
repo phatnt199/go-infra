@@ -1,0 +1,55 @@
+# Go
+# Binaries for programs and plugins
+/bin/
+/build/
+/dist/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+
+# Test and coverage output
+*.out
+*.coverprofile
+coverage.out
+
+# Dependency directories
+/vendor/
+/Godeps/
+/Godeps/**
+
+# Optional vendor lockfiles (if using dep)
+Gopkg.lock
+Gopkg.toml
+
+# IDEs and editors
+.idea/
+.vscode/
+*.iml
+*.sublime-workspace
+*.sublime-project
+
+# Editor temp files
+*~
+*.swp
+*.swo
+*.bak
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment / local configs
+.env
+.env.*.local
+local.env
+
+# Logs and runtime files
+*.log
+*.pid
+
+# Misc
+*.prof
+.coverage

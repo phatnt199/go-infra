@@ -16,8 +16,17 @@ func SetupRoutes(
 
 	// API group with v1 versioning
 	server.ConfigGroup("/api/v1", func(group contracts.RouteGroup) {
-		// Users routes
+		// Users routes - CRUD operations
+		// GET /api/v1/users - Get all users
 		group.GET("/users", userHandler.GetAllUsers)
+		// POST /api/v1/users - Create a new user
+		group.POST("/users", userHandler.CreateUser)
+		// GET /api/v1/users/:id - Get a user by ID
+		group.GET("/users/:id", userHandler.GetUserByID)
+		// PUT /api/v1/users/:id - Update a user
+		group.PUT("/users/:id", userHandler.UpdateUser)
+		// DELETE /api/v1/users/:id - Delete a user
+		group.DELETE("/users/:id", userHandler.DeleteUser)
 	})
 
 	// Health check endpoint (outside API group)

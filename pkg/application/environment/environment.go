@@ -44,7 +44,7 @@ func ConfigAppEnv(environments ...Environment) Environment {
 	FixProjectRootWorkingDirectoryPath()
 
 	manualEnv := os.Getenv(constants.APP_ENV)
-
+	log.Printf("ConfigAppEnv: detected APP_ENV from system environment: %q", Environment(manualEnv))
 	if manualEnv != "" {
 		environment = Environment(manualEnv)
 	}

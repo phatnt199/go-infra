@@ -21,7 +21,6 @@ import (
 // @BasePath /api/v1
 func main() {
 	// Load .env file (optional - will use system env if not found)
-	// _ = godotenv.Load("../../.env")
 
 	// Create application builder with fx dependency injection
 	appBuilder := fxapp.NewApplicationBuilder()

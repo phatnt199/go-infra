@@ -147,7 +147,7 @@ func (r *UserRepository) Delete(ctx context.Context, id uuid.UUID) error {
 		"id": id,
 	})
 
-	if err := r.db.WithContext(ctx).Delete(&domain.User{}, "id = ?", id).Error; err != nil {
+	if err := r.db.WithContext(ctx).Delete(&domain.User{}, id).Error; err != nil {
 		r.logger.Errorw("Failed to delete user from database", logger.Fields{
 			"id":    id,
 			"error": err,

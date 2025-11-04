@@ -123,10 +123,7 @@ func (m *goMigratePostgresMigrator) executeCommand(command migration.CommandType
 		if version == 0 {
 			err = m.migration.Down()
 		} else {
-			// For version-specific down, we need to go back to version 0 and then forward to version-1
-			// However, the migrate library's Down() goes back one step
-			// So we call Down() multiple times or use a different approach
-			// Actually, for down migrations with version, we should go to version-1
+			// For version-specific down migrations, migrate to (version - 1) to effectively roll back to the state before the specified version.
 			if version == 0 {
 				return errors.New("invalid version for down migration")
 			}

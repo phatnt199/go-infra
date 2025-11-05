@@ -149,11 +149,16 @@ func checkDatabaseExists(db *sql.DB, dbName string) (bool, error) {
 }
 
 func createDatabase(db *sql.DB, dbName string) error {
-	query := fmt.Sprintf("CREATE DATABASE %s", dbName)
+	// Quote the database name to support names with special characters (e.g., hyphens)
+	query := fmt.Sprintf("CREATE DATABASE \"%s\"", dbName)
 	_, err := db.Exec(query)
 	if err != nil {
 		return errors.Wrapf(err, "Failed to create database %s", dbName)
 	}
 
 	return nil
+}
+
+func NewSQLDB(orm *gorm.DB) (*sql.DB, error) {
+	return orm.DB()
 }

@@ -1,4 +1,345 @@
+definitions:
+  requests.ChangePasswordRequest:
+    properties:
+      newPassword:
+        minLength: 8
+        type: string
+      oldPassword:
+        type: string
+    required:
+    - newPassword
+    - oldPassword
+    type: object
+  requests.SignInRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  requests.SignUpRequest:
+    properties:
+      firstname:
+        maxLength: 100
+        type: string
+      lastname:
+        maxLength: 100
+        type: string
+      locale:
+        description: e.g., en_US, vi_VN
+        type: string
+      password:
+        minLength: 8
+        type: string
+      username:
+        maxLength: 50
+        minLength: 3
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  requests.UpdateProfileRequest:
+    properties:
+      birthday:
+        type: string
+      firstname:
+        maxLength: 100
+        type: string
+      lastname:
+        maxLength: 100
+        type: string
+      locale:
+        type: string
+    type: object
+  responses.AuthResponse:
+    properties:
+      accessToken:
+        type: string
+      refreshToken:
+        type: string
+      userId:
+        type: string
+    type: object
+  responses.MessageResponse:
+    properties:
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
+  responses.UserFullDetailsResponse:
+    properties:
+      identifier:
+        $ref: '#/definitions/responses.UserIdentifierResponse'
+      profile:
+        $ref: '#/definitions/responses.UserProfileResponse'
+      user:
+        $ref: '#/definitions/responses.UserResponse'
+    type: object
+  responses.UserIdentifierResponse:
+    properties:
+      id:
+        type: string
+      identifier:
+        type: string
+      scheme:
+        type: string
+      verified:
+        type: boolean
+    type: object
+  responses.UserProfileResponse:
+    properties:
+      birthday:
+        type: string
+      createdAt:
+        type: string
+      details:
+        additionalProperties: true
+        type: object
+      firstname:
+        type: string
+      id:
+        type: string
+      lastname:
+        type: string
+      locale:
+        type: string
+      modifiedAt:
+        type: string
+    type: object
+  responses.UserResponse:
+    properties:
+      activatedAt:
+        type: string
+      createdAt:
+        type: string
+      id:
+        type: string
+      lastLoginAt:
+        type: string
+      modifiedAt:
+        type: string
+      status:
+        type: integer
+      userType:
+        type: string
+      validFrom:
+        type: string
+      validTo:
+        type: string
+    type: object
 info:
   contact: {}
-paths: {}
+paths:
+  /api/v1/auth/change-password/{id}:
+    post:
+      consumes:
+      - application/json
+      description: Change password for authenticated user
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Change password request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/requests.ChangePasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/responses.MessageResponse'
+      summary: Change user password
+      tags:
+      - Auth
+  /api/v1/auth/signin:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate user and get access token
+      parameters:
+      - description: Signin request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/requests.SignInRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.AuthResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/responses.MessageResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/responses.MessageResponse'
+      summary: Sign in
+      tags:
+      - Auth
+  /api/v1/auth/signup:
+    post:
+      consumes:
+      - application/json
+      description: Create a new user account with username and password
+      parameters:
+      - description: Signup request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/requests.SignUpRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/responses.AuthResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/responses.MessageResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.MessageResponse'
+      summary: Sign up a new user
+      tags:
+      - Auth
+  /api/v1/users/{id}:
+    get:
+      description: Get full user details (without password)
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.UserFullDetailsResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/responses.MessageResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/responses.MessageResponse'
+      summary: Get user details
+      tags:
+      - Users
+  /api/v1/users/{id}/disable:
+    post:
+      description: Deactivate a user account
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/responses.MessageResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/responses.MessageResponse'
+      summary: Disable user
+      tags:
+      - Users
+  /api/v1/users/{id}/enable:
+    post:
+      description: Activate a user account
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/responses.MessageResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/responses.MessageResponse'
+      summary: Enable user
+      tags:
+      - Users
+  /api/v1/users/{id}/profile:
+    put:
+      consumes:
+      - application/json
+      description: Update user profile information
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update profile request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/requests.UpdateProfileRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/responses.MessageResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/responses.MessageResponse'
+      summary: Update user profile
+      tags:
+      - Users
 swagger: "2.0"

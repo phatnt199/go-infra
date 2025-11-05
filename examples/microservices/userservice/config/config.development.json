@@ -36,5 +36,10 @@
     "sslMode": false,
     "migrationsDir": "db/migrations/goose-migrate",
     "skipMigration": false
+  },
+  "jwtOptions": {
+    "secret": "your-secret-key-change-in-production",
+    "accessTokenExpiration": 3600,
+    "refreshTokenExpiration": 86400
   }
 }

@@ -1,0 +1,16 @@
+package models
+
+import (
+	"time"
+
+	uuid "github.com/satori/go.uuid"
+)
+
+type User struct {
+	ID        uuid.UUID
+	Name      string
+	Email     string
+	Password  string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+}

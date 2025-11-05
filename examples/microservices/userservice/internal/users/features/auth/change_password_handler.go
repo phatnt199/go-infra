@@ -77,10 +77,11 @@ func (h *changePasswordHandler) handler() contracts.HandlerFunc {
 		}
 
 		// Convert to service request
+		req.UserID = userID
 		serviceReq := &services.ChangePasswordRequest{
 			UserID:      userID,
-			OldPassword: req.OldPassword,
-			NewPassword: req.NewPassword,
+			OldPassword: req.GetOldPassword(),
+			NewPassword: req.GetNewPassword(),
 		}
 
 		err = h.UserService.ChangePassword(ctx, serviceReq)

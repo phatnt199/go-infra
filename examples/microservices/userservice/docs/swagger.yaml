@@ -1,28 +1,69 @@
 definitions:
   requests.ChangePasswordRequest:
     properties:
+      newCredential:
+        $ref: '#/definitions/requests.Credential'
       newPassword:
-        minLength: 8
         type: string
+      oldCredential:
+        allOf:
+        - $ref: '#/definitions/requests.Credential'
+        description: Node-infra style fields
       oldPassword:
+        description: Simple style (for backwards compatibility)
+        type: string
+    type: object
+  requests.Credential:
+    properties:
+      scheme:
+        type: string
+      value:
         type: string
     required:
-    - newPassword
-    - oldPassword
+    - scheme
+    - value
+    type: object
+  requests.Identifier:
+    properties:
+      scheme:
+        type: string
+      value:
+        type: string
+    required:
+    - scheme
+    - value
     type: object
   requests.SignInRequest:
     properties:
+      clientId:
+        description: optional client ID for multi-tenant scenarios
+        type: string
+      credential:
+        $ref: '#/definitions/requests.Credential'
+      identifier:
+        allOf:
+        - $ref: '#/definitions/requests.Identifier'
+        description: Node-infra style fields (preferred)
       password:
+        minLength: 1
         type: string
       username:
+        description: Simple legacy style (for backwards compatibility)
+        minLength: 1
         type: string
-    required:
-    - password
-    - username
     type: object
   requests.SignUpRequest:
     properties:
+      birthday:
+        description: 'ISO format: YYYY-MM-DD'
+        type: string
+      credential:
+        allOf:
+        - $ref: '#/definitions/requests.Credential'
+        description: Node-infra compatibility - for credential object if provided
+          instead of plain password
       firstname:
+        description: Profile fields - can be omitted, will use defaults if not provided
         maxLength: 100
         type: string
       lastname:
@@ -35,6 +76,7 @@ definitions:
         minLength: 8
         type: string
       username:
+        description: Required fields
         maxLength: 50
         minLength: 3
         type: string
@@ -57,11 +99,29 @@ definitions:
     type: object
   responses.AuthResponse:
     properties:
-      accessToken:
+      createdAt:
+        type: string
+      firstname:
+        type: string
+      lastname:
         type: string
       refreshToken:
-        type: string
+        allOf:
+        - $ref: '#/definitions/responses.TokenInfo'
+        description: refresh token
+      status:
+        description: user status
+        type: integer
+      token:
+        allOf:
+        - $ref: '#/definitions/responses.TokenInfo'
+        description: main token (for node-infra compat as "token")
       userId:
+        type: string
+      userType:
+        description: 'default: "user"'
+        type: string
+      username:
         type: string
     type: object
   responses.MessageResponse:
@@ -70,6 +130,19 @@ definitions:
         type: string
       success:
         type: boolean
+    type: object
+  responses.TokenInfo:
+    properties:
+      expiresAt:
+        type: string
+      scheme:
+        description: e.g., "bearer"
+        type: string
+      type:
+        description: e.g., "access", "refresh"
+        type: string
+      value:
+        type: string
     type: object
   responses.UserFullDetailsResponse:
     properties:

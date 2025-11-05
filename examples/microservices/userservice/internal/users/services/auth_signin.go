@@ -20,6 +20,9 @@ type SignInResponse struct {
 	UserID       string `json:"userId"`
 	AccessToken  string `json:"accessToken"`
 	RefreshToken string `json:"refreshToken"`
+	// Additional fields for handlers
+	Username  string    `json:"username,omitempty"`
+	CreatedAt time.Time `json:"createdAt,omitempty"`
 }
 
 // SignIn authenticates a user and returns JWT tokens
@@ -73,5 +76,8 @@ func (s *UserService) SignIn(ctx context.Context, req *SignInRequest) (*SignInRe
 		UserID:       user.ID.String(),
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
+		// include createdAt and username so handlers can build full AuthResponse
+		Username:  req.Username,
+		CreatedAt: user.CreatedAt,
 	}, nil
 }

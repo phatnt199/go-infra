@@ -334,32 +334,83 @@ const docTemplate = `{
     "definitions": {
         "requests.ChangePasswordRequest": {
             "type": "object",
-            "required": [
-                "newPassword",
-                "oldPassword"
-            ],
             "properties": {
+                "newCredential": {
+                    "$ref": "#/definitions/requests.Credential"
+                },
                 "newPassword": {
-                    "type": "string",
-                    "minLength": 8
+                    "type": "string"
+                },
+                "oldCredential": {
+                    "description": "Node-infra style fields",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/requests.Credential"
+                        }
+                    ]
                 },
                 "oldPassword": {
+                    "description": "Simple style (for backwards compatibility)",
+                    "type": "string"
+                }
+            }
+        },
+        "requests.Credential": {
+            "type": "object",
+            "required": [
+                "scheme",
+                "value"
+            ],
+            "properties": {
+                "scheme": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
+                }
+            }
+        },
+        "requests.Identifier": {
+            "type": "object",
+            "required": [
+                "scheme",
+                "value"
+            ],
+            "properties": {
+                "scheme": {
+                    "type": "string"
+                },
+                "value": {
                     "type": "string"
                 }
             }
         },
         "requests.SignInRequest": {
             "type": "object",
-            "required": [
-                "password",
-                "username"
-            ],
             "properties": {
-                "password": {
+                "clientId": {
+                    "description": "optional client ID for multi-tenant scenarios",
                     "type": "string"
                 },
+                "credential": {
+                    "$ref": "#/definitions/requests.Credential"
+                },
+                "identifier": {
+                    "description": "Node-infra style fields (preferred)",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/requests.Identifier"
+                        }
+                    ]
+                },
+                "password": {
+                    "type": "string",
+                    "minLength": 1
+                },
                 "username": {
-                    "type": "string"
+                    "description": "Simple legacy style (for backwards compatibility)",
+                    "type": "string",
+                    "minLength": 1
                 }
             }
         },
@@ -370,7 +421,20 @@ const docTemplate = `{
                 "username"
             ],
             "properties": {
+                "birthday": {
+                    "description": "ISO format: YYYY-MM-DD",
+                    "type": "string"
+                },
+                "credential": {
+                    "description": "Node-infra compatibility - for credential object if provided instead of plain password",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/requests.Credential"
+                        }
+                    ]
+                },
                 "firstname": {
+                    "description": "Profile fields - can be omitted, will use defaults if not provided",
                     "type": "string",
                     "maxLength": 100
                 },
@@ -387,6 +451,7 @@ const docTemplate = `{
                     "minLength": 8
                 },
                 "username": {
+                    "description": "Required fields",
                     "type": "string",
                     "maxLength": 50,
                     "minLength": 3
@@ -415,13 +480,43 @@ const docTemplate = `{
         "responses.AuthResponse": {
             "type": "object",
             "properties": {
-                "accessToken": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "firstname": {
+                    "type": "string"
+                },
+                "lastname": {
                     "type": "string"
                 },
                 "refreshToken": {
-                    "type": "string"
+                    "description": "refresh token",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/responses.TokenInfo"
+                        }
+                    ]
+                },
+                "status": {
+                    "description": "user status",
+                    "type": "integer"
+                },
+                "token": {
+                    "description": "main token (for node-infra compat as \"token\")",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/responses.TokenInfo"
+                        }
+                    ]
                 },
                 "userId": {
+                    "type": "string"
+                },
+                "userType": {
+                    "description": "default: \"user\"",
+                    "type": "string"
+                },
+                "username": {
                     "type": "string"
                 }
             }
@@ -434,6 +529,25 @@ const docTemplate = `{
                 },
                 "success": {
                     "type": "boolean"
+                }
+            }
+        },
+        "responses.TokenInfo": {
+            "type": "object",
+            "properties": {
+                "expiresAt": {
+                    "type": "string"
+                },
+                "scheme": {
+                    "description": "e.g., \"bearer\"",
+                    "type": "string"
+                },
+                "type": {
+                    "description": "e.g., \"access\", \"refresh\"",
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
                 }
             }
         },

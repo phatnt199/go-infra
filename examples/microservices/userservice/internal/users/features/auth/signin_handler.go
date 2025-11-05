@@ -2,6 +2,7 @@ package auth
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/go-playground/validator"
 	"github.com/phatnt199/go-infra/examples/microservices/userservice/internal/users/dtos/v1/requests"
@@ -69,8 +70,8 @@ func (h *signInHandler) handler() contracts.HandlerFunc {
 
 		// Convert DTO to service request
 		serviceReq := &services.SignInRequest{
-			Username: req.Username,
-			Password: req.Password,
+			Username: req.GetUsername(),
+			Password: req.GetPassword(),
 		}
 
 		result, err := h.UserService.SignIn(ctx, serviceReq)
@@ -83,10 +84,35 @@ func (h *signInHandler) handler() contracts.HandlerFunc {
 		}
 
 		userID, _ := uuid.FromString(result.UserID)
-		return c.JSON(http.StatusOK, &responses.AuthResponse{
-			UserID:       userID,
-			AccessToken:  result.AccessToken,
-			RefreshToken: result.RefreshToken,
-		})
+
+		// Build token response structure matching node-infra
+		resp := &responses.AuthResponse{
+			UserID:   userID,
+			Username: req.GetUsername(),
+			Status:   1, // default: active
+			UserType: "user",
+		}
+
+		// Include access token if available
+		if result.AccessToken != "" {
+			resp.AccessToken = &responses.TokenInfo{
+				Value:     result.AccessToken,
+				Scheme:    "bearer",
+				Type:      "access",
+				ExpiresAt: time.Now().Add(24 * time.Hour), // default: 24 hours from now
+			}
+		}
+
+		// Include refresh token if available
+		if result.RefreshToken != "" {
+			resp.RefreshToken = &responses.TokenInfo{
+				Value:     result.RefreshToken,
+				Scheme:    "bearer",
+				Type:      "refresh",
+				ExpiresAt: time.Now().Add(7 * 24 * time.Hour), // default: 7 days from now
+			}
+		}
+
+		return c.JSON(http.StatusOK, resp)
 	}
 }

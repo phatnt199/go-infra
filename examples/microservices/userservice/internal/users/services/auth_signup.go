@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"emperror.dev/errors"
+	"github.com/phatnt199/go-infra/examples/microservices/userservice/internal/users/data/datamodels"
 	"github.com/phatnt199/go-infra/examples/microservices/userservice/internal/users/models"
 	"github.com/phatnt199/go-infra/pkg/crypto"
 	uuid "github.com/satori/go.uuid"
@@ -24,6 +25,8 @@ type SignUpResponse struct {
 	UserID       uuid.UUID `json:"userId"`
 	AccessToken  string    `json:"accessToken"`
 	RefreshToken string    `json:"refreshToken"`
+	UserStatus   string    `json:"userStatus"`
+	UserType     string    `json:"userType"`
 }
 
 // SignUp creates a new user with credentials and profile
@@ -37,8 +40,8 @@ func (s *UserService) SignUp(ctx context.Context, req *SignUpRequest) (*SignUpRe
 	// Create user
 	now := time.Now()
 	user := &models.User{
-		Status:      models.UserStatusActivated,
-		UserType:    models.UserTypeSystem,
+		Status:      string(datamodels.UserStatusActivated),
+		UserType:    string(datamodels.UserTypeSystem),
 		ActivatedAt: &now,
 	}
 
@@ -118,5 +121,7 @@ func (s *UserService) SignUp(ctx context.Context, req *SignUpRequest) (*SignUpRe
 		UserID:       user.ID,
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
+		UserStatus:   user.Status,
+		UserType:     user.UserType,
 	}, nil
 }

@@ -43,14 +43,10 @@ definitions:
       identifier:
         allOf:
         - $ref: '#/definitions/requests.Identifier'
-        description: Node-infra style fields (preferred)
-      password:
-        minLength: 1
-        type: string
-      username:
-        description: Simple legacy style (for backwards compatibility)
-        minLength: 1
-        type: string
+        description: Node-infra style fields
+    required:
+    - credential
+    - identifier
     type: object
   requests.SignUpRequest:
     properties:
@@ -111,7 +107,7 @@ definitions:
         description: refresh token
       status:
         description: user status
-        type: integer
+        type: string
       token:
         allOf:
         - $ref: '#/definitions/responses.TokenInfo'
@@ -197,7 +193,7 @@ definitions:
       modifiedAt:
         type: string
       status:
-        type: integer
+        type: string
       userType:
         type: string
       validFrom:

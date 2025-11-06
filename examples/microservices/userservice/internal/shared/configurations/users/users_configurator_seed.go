@@ -59,8 +59,8 @@ func seedDataManually(db *gorm.DB) error {
 			// Create user
 			user := datamodels.UserDataModel{
 				ID:          userID,
-				Status:      100, // UserStatusActivated
-				UserType:    "SYSTEM",
+				Status:      datamodels.UserStatusActivated, // Use enum constant
+				UserType:    datamodels.UserTypeSystem,      // Use enum constant
 				ActivatedAt: &now,
 				CreatedAt:   now,
 				ModifiedAt:  now,

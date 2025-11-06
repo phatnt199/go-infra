@@ -72,7 +72,7 @@ func (h *getUserHandler) handler() contracts.HandlerFunc {
 		response := &responses.UserFullDetailsResponse{
 			User: &responses.UserResponse{
 				ID:          result.User.ID,
-				Status:      int(result.User.Status),
+				Status:      result.User.Status,
 				UserType:    string(result.User.UserType),
 				ActivatedAt: result.User.ActivatedAt,
 				LastLoginAt: result.User.LastLoginAt,

@@ -21,7 +21,7 @@ type AuthResponse struct {
 	Username     string     `json:"username,omitempty"`
 	Firstname    string     `json:"firstname,omitempty"`
 	Lastname     string     `json:"lastname,omitempty"`
-	Status       int        `json:"status,omitempty"`   // user status
+	Status       string     `json:"status,omitempty"`   // user status
 	UserType     string     `json:"userType,omitempty"` // default: "user"
 	CreatedAt    time.Time  `json:"createdAt,omitempty"`
 	AccessToken  *TokenInfo `json:"token,omitempty"`        // main token (for node-infra compat as "token")

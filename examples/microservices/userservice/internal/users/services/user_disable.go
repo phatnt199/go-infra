@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"emperror.dev/errors"
-	"github.com/phatnt199/go-infra/examples/microservices/userservice/internal/users/models"
+	"github.com/phatnt199/go-infra/examples/microservices/userservice/internal/users/data/datamodels"
 	uuid "github.com/satori/go.uuid"
 )
 
@@ -17,7 +17,7 @@ func (s *UserService) DisableUser(ctx context.Context, userID uuid.UUID) error {
 	}
 
 	// Update status
-	user.Status = models.UserStatusDeactivated
+	user.Status = string(datamodels.UserStatusDeactivated)
 
 	// Save user
 	_, err = s.repository.UpdateUser(ctx, user)
@@ -37,7 +37,7 @@ func (s *UserService) EnableUser(ctx context.Context, userID uuid.UUID) error {
 	}
 
 	// Update status
-	user.Status = models.UserStatusActivated
+	user.Status = string(datamodels.UserStatusActivated)
 
 	// Save user
 	_, err = s.repository.UpdateUser(ctx, user)

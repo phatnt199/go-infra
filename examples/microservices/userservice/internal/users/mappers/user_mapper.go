@@ -4,7 +4,8 @@ import (
 	"time"
 
 	"github.com/phatnt199/go-infra/examples/microservices/userservice/internal/users/contracts"
-	"github.com/phatnt199/go-infra/examples/microservices/userservice/internal/users/dtos/v1"
+	"github.com/phatnt199/go-infra/examples/microservices/userservice/internal/users/data/datamodels"
+	dtosv1 "github.com/phatnt199/go-infra/examples/microservices/userservice/internal/users/dtos/v1"
 	"github.com/phatnt199/go-infra/examples/microservices/userservice/internal/users/models"
 	uuid "github.com/satori/go.uuid"
 )
@@ -17,7 +18,7 @@ func ToUserResponse(user *models.User) *dtosv1.UserResponse {
 
 	resp := &dtosv1.UserResponse{
 		ID:         user.ID,
-		Status:     int(user.Status),
+		Status:     user.Status,
 		UserType:   string(user.UserType),
 		CreatedAt:  user.CreatedAt.Format(time.RFC3339),
 		ModifiedAt: user.ModifiedAt.Format(time.RFC3339),
@@ -101,7 +102,7 @@ func ToUserFullDetailsResponse(details *contracts.UserFullDetails) *dtosv1.UserF
 func ToAuthResponse(user *models.User, identifier *models.UserIdentifier, profile *models.UserProfile, token string) *dtosv1.AuthResponse {
 	resp := &dtosv1.AuthResponse{
 		UserID:    user.ID,
-		Status:    int(user.Status),
+		Status:    user.Status,
 		UserType:  string(user.UserType),
 		CreatedAt: user.CreatedAt.Format(time.RFC3339),
 		Token:     token,
@@ -145,4 +146,52 @@ func ParseUUID(uuidStr string) (*uuid.UUID, error) {
 	}
 
 	return &id, nil
+}
+
+// ToUser converts UserDataModel to User domain model
+func ToUser(dataModel *datamodels.UserDataModel) *models.User {
+	if dataModel == nil {
+		return nil
+	}
+
+	user := &models.User{
+		Status:      dataModel.Status.String(),   // Convert enum to string
+		UserType:    dataModel.UserType.String(), // Convert enum to string
+		ActivatedAt: dataModel.ActivatedAt,
+		LastLoginAt: dataModel.LastLoginAt,
+		ParentID:    dataModel.ParentID,
+		ValidFrom:   dataModel.ValidFrom,
+		ValidTo:     dataModel.ValidTo,
+	}
+
+	// Set base entity fields
+	user.ID = dataModel.ID
+	user.CreatedAt = dataModel.CreatedAt
+	user.ModifiedAt = dataModel.ModifiedAt
+
+	return user
+}
+
+// ToUserDataModel converts User domain model to UserDataModel
+func ToUserDataModel(user *models.User) *datamodels.UserDataModel {
+	if user == nil {
+		return nil
+	}
+
+	dataModel := &datamodels.UserDataModel{
+		ID:          user.ID,
+		CreatedAt:   user.CreatedAt,
+		ModifiedAt:  user.ModifiedAt,
+		ActivatedAt: user.ActivatedAt,
+		LastLoginAt: user.LastLoginAt,
+		ParentID:    user.ParentID,
+		ValidFrom:   user.ValidFrom,
+		ValidTo:     user.ValidTo,
+	}
+
+	// Convert domain types to data model enums
+	// dataModel.Status.FromInt(int(user.Status))
+	dataModel.UserType = datamodels.UserTypeEnum(user.UserType)
+
+	return dataModel
 }

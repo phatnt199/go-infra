@@ -6,6 +6,7 @@ import (
 
 	"emperror.dev/errors"
 	"github.com/phatnt199/go-infra/examples/microservices/userservice/internal/users/contracts"
+	"github.com/phatnt199/go-infra/examples/microservices/userservice/internal/users/data/datamodels"
 	"github.com/phatnt199/go-infra/examples/microservices/userservice/internal/users/models"
 	"github.com/phatnt199/go-infra/pkg/crypto"
 	"github.com/phatnt199/go-infra/pkg/logger"
@@ -19,8 +20,8 @@ type UserSeed struct {
 	Firstname string
 	Lastname  string
 	Locale    string
-	UserType  models.UserType
-	Status    models.UserStatus
+	UserType  string
+	Status    string
 }
 
 // Seeder handles database seeding
@@ -53,8 +54,8 @@ func (s *Seeder) SeedUsers(ctx context.Context) error {
 			Firstname: "Super",
 			Lastname:  "Administrator",
 			Locale:    "en_US",
-			UserType:  models.UserTypeSystem,
-			Status:    models.UserStatusActivated,
+			UserType:  datamodels.UserTypeSystem.String(),
+			Status:    datamodels.UserStatusActivated.String(),
 		},
 		{
 			Username:  "admin",
@@ -62,8 +63,8 @@ func (s *Seeder) SeedUsers(ctx context.Context) error {
 			Firstname: "System",
 			Lastname:  "Admin",
 			Locale:    "en_US",
-			UserType:  models.UserTypeSystem,
-			Status:    models.UserStatusActivated,
+			UserType:  datamodels.UserTypeSystem.String(),
+			Status:    datamodels.UserStatusActivated.String(),
 		},
 		{
 			Username:  "maintainer",
@@ -71,8 +72,8 @@ func (s *Seeder) SeedUsers(ctx context.Context) error {
 			Firstname: "System",
 			Lastname:  "Maintainer",
 			Locale:    "en_US",
-			UserType:  models.UserTypeSystem,
-			Status:    models.UserStatusActivated,
+			UserType:  datamodels.UserTypeSystem.String(),
+			Status:    datamodels.UserStatusActivated.String(),
 		},
 		{
 			Username:  "manager",
@@ -80,8 +81,8 @@ func (s *Seeder) SeedUsers(ctx context.Context) error {
 			Firstname: "System",
 			Lastname:  "Manager",
 			Locale:    "en_US",
-			UserType:  models.UserTypeSystem,
-			Status:    models.UserStatusActivated,
+			UserType:  datamodels.UserTypeSystem.String(),
+			Status:    datamodels.UserStatusActivated.String(),
 		},
 		{
 			Username:  "customer",
@@ -89,8 +90,8 @@ func (s *Seeder) SeedUsers(ctx context.Context) error {
 			Firstname: "Test",
 			Lastname:  "Customer",
 			Locale:    "en_US",
-			UserType:  models.UserTypeSystem,
-			Status:    models.UserStatusActivated,
+			UserType:  datamodels.UserTypeSystem.String(),
+			Status:    datamodels.UserStatusActivated.String(),
 		},
 	}
 

@@ -69,12 +69,7 @@ func (h *signInHandler) handler() contracts.HandlerFunc {
 		}
 
 		// Convert DTO to service request
-		serviceReq := &services.SignInRequest{
-			Username: req.GetUsername(),
-			Password: req.GetPassword(),
-		}
-
-		result, err := h.UserService.SignIn(ctx, serviceReq)
+		result, err := h.UserService.SignIn(ctx, &req)
 		if err != nil {
 			h.Logger.Warnf("Failed to sign in: %v", err)
 			return c.JSON(http.StatusUnauthorized, &responses.MessageResponse{
@@ -85,12 +80,13 @@ func (h *signInHandler) handler() contracts.HandlerFunc {
 
 		userID, _ := uuid.FromString(result.UserID)
 
-		// Build token response structure matching node-infra
+		// Build token response structure
 		resp := &responses.AuthResponse{
-			UserID:   userID,
-			Username: req.GetUsername(),
-			Status:   1, // default: active
-			UserType: "user",
+			UserID:    userID,
+			Username:  result.Username,
+			Status:    result.UserStatus,
+			UserType:  result.UserType,
+			CreatedAt: result.CreatedAt,
 		}
 
 		// Include access token if available
@@ -99,7 +95,7 @@ func (h *signInHandler) handler() contracts.HandlerFunc {
 				Value:     result.AccessToken,
 				Scheme:    "bearer",
 				Type:      "access",
-				ExpiresAt: time.Now().Add(24 * time.Hour), // default: 24 hours from now
+				ExpiresAt: time.Now().Add(result.AccessTokenExpiry),
 			}
 		}
 
@@ -109,7 +105,7 @@ func (h *signInHandler) handler() contracts.HandlerFunc {
 				Value:     result.RefreshToken,
 				Scheme:    "bearer",
 				Type:      "refresh",
-				ExpiresAt: time.Now().Add(7 * 24 * time.Hour), // default: 7 days from now
+				ExpiresAt: time.Now().Add(result.RefreshTokenExpiry),
 			}
 		}
 

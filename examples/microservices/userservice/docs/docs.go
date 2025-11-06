@@ -387,6 +387,10 @@ const docTemplate = `{
         },
         "requests.SignInRequest": {
             "type": "object",
+            "required": [
+                "credential",
+                "identifier"
+            ],
             "properties": {
                 "clientId": {
                     "description": "optional client ID for multi-tenant scenarios",
@@ -396,21 +400,12 @@ const docTemplate = `{
                     "$ref": "#/definitions/requests.Credential"
                 },
                 "identifier": {
-                    "description": "Node-infra style fields (preferred)",
+                    "description": "Node-infra style fields",
                     "allOf": [
                         {
                             "$ref": "#/definitions/requests.Identifier"
                         }
                     ]
-                },
-                "password": {
-                    "type": "string",
-                    "minLength": 1
-                },
-                "username": {
-                    "description": "Simple legacy style (for backwards compatibility)",
-                    "type": "string",
-                    "minLength": 1
                 }
             }
         },
@@ -499,7 +494,7 @@ const docTemplate = `{
                 },
                 "status": {
                     "description": "user status",
-                    "type": "integer"
+                    "type": "string"
                 },
                 "token": {
                     "description": "main token (for node-infra compat as \"token\")",
@@ -631,7 +626,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "status": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "userType": {
                     "type": "string"

@@ -5,32 +5,46 @@ import (
 	"time"
 
 	"emperror.dev/errors"
+	"github.com/phatnt199/go-infra/examples/microservices/userservice/internal/users/data/datamodels"
+	"github.com/phatnt199/go-infra/examples/microservices/userservice/internal/users/dtos/v1/requests"
 	"github.com/phatnt199/go-infra/examples/microservices/userservice/internal/users/models"
 	"github.com/phatnt199/go-infra/pkg/crypto"
+	"gorm.io/gorm"
 )
-
-// SignInRequest contains the data needed to sign in
-type SignInRequest struct {
-	Username string `json:"username" validate:"required"`
-	Password string `json:"password" validate:"required"`
-}
 
 // SignInResponse contains the response data after signin
 type SignInResponse struct {
-	UserID       string `json:"userId"`
-	AccessToken  string `json:"accessToken"`
-	RefreshToken string `json:"refreshToken"`
-	// Additional fields for handlers
-	Username  string    `json:"username,omitempty"`
-	CreatedAt time.Time `json:"createdAt,omitempty"`
+	UserID             string        `json:"userId"`
+	AccessToken        string        `json:"accessToken"`
+	RefreshToken       string        `json:"refreshToken"`
+	AccessTokenExpiry  time.Duration `json:"-"` // Not serialized, used internally
+	RefreshTokenExpiry time.Duration `json:"-"` // Not serialized, used internally
+	Username           string        `json:"username,omitempty"`
+	CreatedAt          time.Time     `json:"createdAt,omitempty"`
+	UserType           string        `json:"userType,omitempty"`
+	UserStatus         string        `json:"userStatus,omitempty"`
 }
 
 // SignIn authenticates a user and returns JWT tokens
-func (s *UserService) SignIn(ctx context.Context, req *SignInRequest) (*SignInResponse, error) {
+func (s *UserService) SignIn(ctx context.Context, req *requests.SignInRequest) (*SignInResponse, error) {
+	// Determine schemes to use (with defaults)
+	identifierScheme := req.Identifier.Scheme
+	if identifierScheme == "" {
+		identifierScheme = string(models.IdentifierSchemeUsername)
+	}
+
+	credentialScheme := req.Credential.Scheme
+	if credentialScheme == "" {
+		credentialScheme = string(models.CredentialSchemeBasic)
+	}
+
 	// Get user identifier
-	identifier, err := s.repository.GetUserIdentifierBySchemeAndIdentifier(ctx, models.IdentifierSchemeUsername, req.Username)
+	identifier, err := s.repository.GetUserIdentifierBySchemeAndIdentifier(ctx, identifierScheme, req.GetUsername())
 	if err != nil {
-		return nil, errors.New("invalid username or password")
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.New("invalid username or password")
+		}
+		return nil, errors.Wrap(err, "failed to get user identifier")
 	}
 
 	// Get user
@@ -40,18 +54,18 @@ func (s *UserService) SignIn(ctx context.Context, req *SignInRequest) (*SignInRe
 	}
 
 	// Check if user is activated
-	if user.Status != models.UserStatusActivated {
+	if user.Status != string(datamodels.UserStatusActivated) {
 		return nil, errors.New("user account is not activated")
 	}
 
 	// Get user credential
-	credential, err := s.repository.GetUserCredentialByUserIDAndScheme(ctx, user.ID, models.CredentialSchemeBasic)
+	credential, err := s.repository.GetUserCredentialByUserIDAndScheme(ctx, user.ID, credentialScheme)
 	if err != nil {
 		return nil, errors.New("invalid username or password")
 	}
 
 	// Verify password
-	valid, err := s.hasher.ComparePassword(req.Password, credential.Credential)
+	valid, err := s.hasher.ComparePassword(req.GetPassword(), credential.Credential)
 	if err != nil || !valid {
 		return nil, errors.New("invalid username or password")
 	}
@@ -64,7 +78,7 @@ func (s *UserService) SignIn(ctx context.Context, req *SignInRequest) (*SignInRe
 	// Generate JWT tokens
 	claims := &crypto.Claims{
 		UserID:   user.ID.String(),
-		Username: req.Username,
+		Username: req.GetUsername(),
 	}
 
 	accessToken, refreshToken, err := s.jwtManager.GenerateTokenPair(claims)
@@ -73,11 +87,14 @@ func (s *UserService) SignIn(ctx context.Context, req *SignInRequest) (*SignInRe
 	}
 
 	return &SignInResponse{
-		UserID:       user.ID.String(),
-		AccessToken:  accessToken,
-		RefreshToken: refreshToken,
-		// include createdAt and username so handlers can build full AuthResponse
-		Username:  req.Username,
-		CreatedAt: user.CreatedAt,
+		UserID:             user.ID.String(),
+		AccessToken:        accessToken,
+		RefreshToken:       refreshToken,
+		AccessTokenExpiry:  s.jwtManager.GetAccessTokenExpiry(),
+		RefreshTokenExpiry: s.jwtManager.GetRefreshTokenExpiry(),
+		Username:           req.GetUsername(),
+		CreatedAt:          user.CreatedAt,
+		UserType:           user.UserType,
+		UserStatus:         user.Status,
 	}, nil
 }

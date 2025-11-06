@@ -376,6 +376,10 @@
         },
         "requests.SignInRequest": {
             "type": "object",
+            "required": [
+                "credential",
+                "identifier"
+            ],
             "properties": {
                 "clientId": {
                     "description": "optional client ID for multi-tenant scenarios",
@@ -385,21 +389,12 @@
                     "$ref": "#/definitions/requests.Credential"
                 },
                 "identifier": {
-                    "description": "Node-infra style fields (preferred)",
+                    "description": "Node-infra style fields",
                     "allOf": [
                         {
                             "$ref": "#/definitions/requests.Identifier"
                         }
                     ]
-                },
-                "password": {
-                    "type": "string",
-                    "minLength": 1
-                },
-                "username": {
-                    "description": "Simple legacy style (for backwards compatibility)",
-                    "type": "string",
-                    "minLength": 1
                 }
             }
         },
@@ -488,7 +483,7 @@
                 },
                 "status": {
                     "description": "user status",
-                    "type": "integer"
+                    "type": "string"
                 },
                 "token": {
                     "description": "main token (for node-infra compat as \"token\")",
@@ -620,7 +615,7 @@
                     "type": "string"
                 },
                 "status": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "userType": {
                     "type": "string"

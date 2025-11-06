@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"emperror.dev/errors"
-	basemodels "github.com/phatnt199/go-infra/examples/microservices/userservice/internal/shared/data/models"
 	"github.com/phatnt199/go-infra/examples/microservices/userservice/internal/users/contracts"
 	"github.com/phatnt199/go-infra/examples/microservices/userservice/internal/users/data/datamodels"
 	"github.com/phatnt199/go-infra/examples/microservices/userservice/internal/users/models"
@@ -34,8 +33,6 @@ func NewPostgresUserRepository(
 func (p *postgresUserRepository) CreateUser(ctx context.Context, user *models.User) (*models.User, error) {
 	dataModel := &datamodels.UserDataModel{
 		ID:          user.ID,
-		Status:      int(user.Status),
-		UserType:    string(user.UserType),
 		ActivatedAt: user.ActivatedAt,
 		LastLoginAt: user.LastLoginAt,
 		ParentID:    user.ParentID,
@@ -43,12 +40,16 @@ func (p *postgresUserRepository) CreateUser(ctx context.Context, user *models.Us
 		ValidTo:     user.ValidTo,
 	}
 
+	// Convert domain enums to data model enums
+	// dataModel.Status.FromInt(int(user.Status))
+	dataModel.UserType = datamodels.UserTypeEnum(user.UserType)
+
 	if err := p.db.WithContext(ctx).Create(dataModel).Error; err != nil {
 		return nil, errors.Wrap(err, "failed to create user")
 	}
 
 	user.ID = dataModel.ID
-	user.BaseEntity.CreatedAt = dataModel.CreatedAt
+	user.CreatedAt = dataModel.CreatedAt
 	user.BaseEntity.ModifiedAt = dataModel.ModifiedAt
 	return user, nil
 }
@@ -98,8 +99,8 @@ func (p *postgresUserRepository) GetAllUsers(ctx context.Context, listQuery *uti
 
 func (p *postgresUserRepository) UpdateUser(ctx context.Context, user *models.User) (*models.User, error) {
 	updates := map[string]interface{}{
-		"status":        int(user.Status),
-		"user_type":     string(user.UserType),
+		"status":        user.Status,
+		"user_type":     user.UserType,
 		"activated_at":  user.ActivatedAt,
 		"last_login_at": user.LastLoginAt,
 		"parent_id":     user.ParentID,
@@ -125,19 +126,20 @@ func (p *postgresUserRepository) DeleteUser(ctx context.Context, id uuid.UUID) e
 
 // Helper method to convert data model to domain model
 func (p *postgresUserRepository) toUserModel(dm *datamodels.UserDataModel) *models.User {
-	return &models.User{
-		BaseEntity: basemodels.BaseEntity{
-			ID:         dm.ID,
-			CreatedAt:  dm.CreatedAt,
-			ModifiedAt: dm.ModifiedAt,
-			DeletedAt:  dm.DeletedAt,
-		},
-		Status:      models.UserStatus(dm.Status),
-		UserType:    models.UserType(dm.UserType),
+	user := &models.User{
+		Status:      dm.Status.String(),
+		UserType:    dm.UserType.String(),
 		ActivatedAt: dm.ActivatedAt,
 		LastLoginAt: dm.LastLoginAt,
 		ParentID:    dm.ParentID,
 		ValidFrom:   dm.ValidFrom,
 		ValidTo:     dm.ValidTo,
 	}
+
+	// Set base entity fields
+	user.ID = dm.ID
+	user.CreatedAt = dm.CreatedAt
+	user.ModifiedAt = dm.ModifiedAt
+
+	return user
 }

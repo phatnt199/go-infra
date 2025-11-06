@@ -18,8 +18,10 @@ type SignUpRequest struct {
 
 // SignInRequest represents user login request
 type SignInRequest struct {
-	Username string `json:"username" validate:"required"`
-	Password string `json:"password" validate:"required"`
+	Username         string `json:"username" validate:"required"`
+	Password         string `json:"password" validate:"required"`
+	IdentifierScheme string `json:"-"` // Not serialized, used internally for scheme lookup
+	CredentialScheme string `json:"-"` // Not serialized, used internally for scheme lookup
 }
 
 // ChangePasswordRequest represents password change request
@@ -35,7 +37,7 @@ type AuthResponse struct {
 	Username  string    `json:"username"`
 	Firstname string    `json:"firstname"`
 	Lastname  string    `json:"lastname"`
-	Status    int       `json:"status"`
+	Status    string    `json:"status"`
 	UserType  string    `json:"userType"`
 	CreatedAt string    `json:"createdAt"` // ISO format
 	Token     string    `json:"token,omitempty"`
@@ -70,7 +72,7 @@ type UserProfileResponse struct {
 // UserResponse represents user basic information
 type UserResponse struct {
 	ID          uuid.UUID `json:"id"`
-	Status      int       `json:"status"`
+	Status      string    `json:"status"`
 	UserType    string    `json:"userType"`
 	ActivatedAt string    `json:"activatedAt,omitempty"` // ISO format
 	LastLoginAt string    `json:"lastLoginAt,omitempty"` // ISO format

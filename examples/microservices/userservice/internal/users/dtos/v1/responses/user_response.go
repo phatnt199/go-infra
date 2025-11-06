@@ -9,7 +9,7 @@ import (
 // UserResponse DTO for user information (without sensitive data)
 type UserResponse struct {
 	ID          uuid.UUID  `json:"id"`
-	Status      int        `json:"status"`
+	Status      string     `json:"status"`
 	UserType    string     `json:"userType"`
 	ActivatedAt *time.Time `json:"activatedAt,omitempty"`
 	LastLoginAt *time.Time `json:"lastLoginAt,omitempty"`

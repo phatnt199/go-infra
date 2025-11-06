@@ -91,8 +91,8 @@ func (h *signUpHandler) handler() contracts.HandlerFunc {
 			Username:  req.Username,
 			Firstname: req.GetFirstname(),
 			Lastname:  req.GetLastname(),
-			Status:    1, // default: active
-			UserType:  "user",
+			Status:    result.UserStatus,
+			UserType:  result.UserType,
 			CreatedAt: time.Now(),
 		}
 

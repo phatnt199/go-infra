@@ -7,6 +7,7 @@ import (
 	"emperror.dev/errors"
 	"github.com/phatnt199/go-infra/examples/microservices/userservice/internal/shared/utils"
 	"github.com/phatnt199/go-infra/examples/microservices/userservice/internal/users/contracts"
+	"github.com/phatnt199/go-infra/examples/microservices/userservice/internal/users/data/datamodels"
 	"github.com/phatnt199/go-infra/examples/microservices/userservice/internal/users/dtos/v1"
 	"github.com/phatnt199/go-infra/examples/microservices/userservice/internal/users/mappers"
 	"github.com/phatnt199/go-infra/examples/microservices/userservice/internal/users/models"
@@ -47,8 +48,8 @@ func (s *authService) SignUp(ctx context.Context, req *dtosv1.SignUpRequest) (*d
 	// Create user
 	now := time.Now()
 	user := &models.User{
-		Status:      models.UserStatusActivated,
-		UserType:    models.UserTypeSystem,
+		Status:      string(datamodels.UserStatusActivated),
+		UserType:    string(datamodels.UserTypeSystem),
 		ActivatedAt: &now,
 	}
 
@@ -146,7 +147,7 @@ func (s *authService) SignIn(ctx context.Context, req *dtosv1.SignInRequest) (*d
 	}
 
 	// Check if user is activated
-	if user.Status != models.UserStatusActivated {
+	if user.Status != string(datamodels.UserStatusActivated) {
 		return nil, errors.New("user account is not activated")
 	}
 

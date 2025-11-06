@@ -7,26 +7,11 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
-// UserStatus represents user status
-type UserStatus int
-
-const (
-	UserStatusActivated   UserStatus = 100
-	UserStatusDeactivated UserStatus = 101
-)
-
-// UserType represents user type
-type UserType string
-
-const (
-	UserTypeSystem UserType = "SYSTEM"
-)
-
 // User represents a user in the system
 type User struct {
 	models.BaseEntity
-	Status      UserStatus `json:"status"`
-	UserType    UserType   `json:"userType"`
+	Status      string     `json:"status"`
+	UserType    string     `json:"userType"`
 	ActivatedAt *time.Time `json:"activatedAt,omitempty"`
 	LastLoginAt *time.Time `json:"lastLoginAt,omitempty"`
 	ParentID    *uuid.UUID `json:"parentId,omitempty"`

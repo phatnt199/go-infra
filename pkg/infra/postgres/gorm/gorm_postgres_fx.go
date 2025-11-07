@@ -11,6 +11,7 @@ var Module = fx.Module(
 	fx.Provide(
 		provideConfig,
 		NewGorm,
+		NewSQLDB,
 
 		fx.Annotate(
 			NewGormHealthChecker,

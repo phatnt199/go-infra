@@ -14,7 +14,30 @@ var FxLogger = fx.WithLogger(func(logger logger.Logger) fxevent.Logger {
 },
 )
 
-// Ref: https://articles.wesionary.team/logging-interfaces-in-go-182c28be3d18
+// formatErrorChain formats an error chain into a more readable format
+// It extracts key information from the error message to make it easier to understand dependency injection issues
+func formatErrorChain(err error) string {
+	errStr := err.Error()
+
+	// If it's a dependency injection error, format it more clearly
+	if strings.Contains(errStr, "missing type:") {
+		lines := strings.Split(errStr, "\n")
+		var formatted []string
+
+		for _, line := range lines {
+			line = strings.TrimSpace(line)
+			if line != "" {
+				formatted = append(formatted, line)
+			}
+		}
+
+		if len(formatted) > 0 {
+			return strings.Join(formatted, " | ")
+		}
+	}
+
+	return errStr
+}
 
 type FxCustomLogger struct {
 	logger.Logger
@@ -104,7 +127,7 @@ func (l *FxCustomLogger) LogEvent(event fxevent.Event) {
 	case *fxevent.Invoked:
 		if e.Err != nil {
 			l.Errorw("invoke failed",
-				logger.Fields{"error": e.Err, "stack": e.Trace, "function": e.FunctionName, "module": e.ModuleName},
+				logger.Fields{"error": formatErrorChain(e.Err), "function": e.FunctionName, "module": e.ModuleName},
 			)
 		}
 	case *fxevent.Stopping:
@@ -117,7 +140,7 @@ func (l *FxCustomLogger) LogEvent(event fxevent.Event) {
 		}
 	case *fxevent.RollingBack:
 		l.Errorw("start failed, rolling back",
-			logger.Fields{"error": e.StartErr},
+			logger.Fields{"error": formatErrorChain(e.StartErr)},
 		)
 	case *fxevent.RolledBack:
 		if e.Err != nil {
@@ -128,7 +151,7 @@ func (l *FxCustomLogger) LogEvent(event fxevent.Event) {
 	case *fxevent.Started:
 		if e.Err != nil {
 			l.Errorw("start failed",
-				logger.Fields{"error": e.Err},
+				logger.Fields{"error": formatErrorChain(e.Err)},
 			)
 		} else {
 			l.Debug("started")

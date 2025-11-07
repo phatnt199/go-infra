@@ -1,0 +1,617 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {}
+    },
+    "paths": {
+        "/api/v1/auth/change-password/{id}": {
+            "post": {
+                "description": "Change password for authenticated user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Change user password",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Change password request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.ChangePasswordRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.MessageResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/responses.MessageResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/signin": {
+            "post": {
+                "description": "Authenticate user and get access token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Sign in",
+                "parameters": [
+                    {
+                        "description": "Signin request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.SignInRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.AuthResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/responses.MessageResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/responses.MessageResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/signup": {
+            "post": {
+                "description": "Create a new user account with username and password",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Sign up a new user",
+                "parameters": [
+                    {
+                        "description": "Signup request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.SignUpRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/responses.AuthResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/responses.MessageResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/responses.MessageResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/users/{id}": {
+            "get": {
+                "description": "Get full user details (without password)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Get user details",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.UserFullDetailsResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/responses.MessageResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/responses.MessageResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/users/{id}/disable": {
+            "post": {
+                "description": "Deactivate a user account",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Disable user",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.MessageResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/responses.MessageResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/responses.MessageResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/users/{id}/enable": {
+            "post": {
+                "description": "Activate a user account",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Enable user",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.MessageResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/responses.MessageResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/responses.MessageResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/users/{id}/profile": {
+            "put": {
+                "description": "Update user profile information",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Update user profile",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Update profile request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.UpdateProfileRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.MessageResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/responses.MessageResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/responses.MessageResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "requests.ChangePasswordRequest": {
+            "type": "object",
+            "properties": {
+                "newCredential": {
+                    "$ref": "#/definitions/requests.Credential"
+                },
+                "newPassword": {
+                    "type": "string"
+                },
+                "oldCredential": {
+                    "$ref": "#/definitions/requests.Credential"
+                },
+                "oldPassword": {
+                    "description": "Simple style (for backwards compatibility)",
+                    "type": "string"
+                }
+            }
+        },
+        "requests.Credential": {
+            "type": "object",
+            "required": [
+                "scheme",
+                "value"
+            ],
+            "properties": {
+                "scheme": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
+                }
+            }
+        },
+        "requests.Identifier": {
+            "type": "object",
+            "required": [
+                "scheme",
+                "value"
+            ],
+            "properties": {
+                "scheme": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
+                }
+            }
+        },
+        "requests.SignInRequest": {
+            "type": "object",
+            "required": [
+                "credential",
+                "identifier"
+            ],
+            "properties": {
+                "clientId": {
+                    "description": "optional client ID for multi-tenant scenarios",
+                    "type": "string"
+                },
+                "credential": {
+                    "$ref": "#/definitions/requests.Credential"
+                },
+                "identifier": {
+                    "$ref": "#/definitions/requests.Identifier"
+                }
+            }
+        },
+        "requests.SignUpRequest": {
+            "type": "object",
+            "required": [
+                "password",
+                "username"
+            ],
+            "properties": {
+                "birthday": {
+                    "description": "ISO format: YYYY-MM-DD",
+                    "type": "string"
+                },
+                "credential": {
+                    "description": "For credential object if provided instead of plain password",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/requests.Credential"
+                        }
+                    ]
+                },
+                "firstname": {
+                    "description": "Profile fields - can be omitted, will use defaults if not provided",
+                    "type": "string",
+                    "maxLength": 100
+                },
+                "lastname": {
+                    "type": "string",
+                    "maxLength": 100
+                },
+                "locale": {
+                    "description": "e.g., en_US, vi_VN",
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string",
+                    "minLength": 8
+                },
+                "username": {
+                    "description": "Required fields",
+                    "type": "string",
+                    "maxLength": 50,
+                    "minLength": 3
+                }
+            }
+        },
+        "requests.UpdateProfileRequest": {
+            "type": "object",
+            "properties": {
+                "birthday": {
+                    "type": "string"
+                },
+                "firstname": {
+                    "type": "string",
+                    "maxLength": 100
+                },
+                "lastname": {
+                    "type": "string",
+                    "maxLength": 100
+                },
+                "locale": {
+                    "type": "string"
+                }
+            }
+        },
+        "responses.AuthResponse": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "firstname": {
+                    "type": "string"
+                },
+                "lastname": {
+                    "type": "string"
+                },
+                "refreshToken": {
+                    "description": "refresh token",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/responses.TokenInfo"
+                        }
+                    ]
+                },
+                "status": {
+                    "description": "user status",
+                    "type": "string"
+                },
+                "token": {
+                    "$ref": "#/definitions/responses.TokenInfo"
+                },
+                "userId": {
+                    "type": "string"
+                },
+                "userType": {
+                    "description": "default: \"user\"",
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "responses.MessageResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "responses.TokenInfo": {
+            "type": "object",
+            "properties": {
+                "expiresAt": {
+                    "type": "string"
+                },
+                "scheme": {
+                    "description": "e.g., \"bearer\"",
+                    "type": "string"
+                },
+                "type": {
+                    "description": "e.g., \"access\", \"refresh\"",
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
+                }
+            }
+        },
+        "responses.UserFullDetailsResponse": {
+            "type": "object",
+            "properties": {
+                "identifier": {
+                    "$ref": "#/definitions/responses.UserIdentifierResponse"
+                },
+                "profile": {
+                    "$ref": "#/definitions/responses.UserProfileResponse"
+                },
+                "user": {
+                    "$ref": "#/definitions/responses.UserResponse"
+                }
+            }
+        },
+        "responses.UserIdentifierResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "identifier": {
+                    "type": "string"
+                },
+                "scheme": {
+                    "type": "string"
+                },
+                "verified": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "responses.UserProfileResponse": {
+            "type": "object",
+            "properties": {
+                "birthday": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "details": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "firstname": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "lastname": {
+                    "type": "string"
+                },
+                "locale": {
+                    "type": "string"
+                },
+                "modifiedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "responses.UserResponse": {
+            "type": "object",
+            "properties": {
+                "activatedAt": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "lastLoginAt": {
+                    "type": "string"
+                },
+                "modifiedAt": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "userType": {
+                    "type": "string"
+                },
+                "validFrom": {
+                    "type": "string"
+                },
+                "validTo": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

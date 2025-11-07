@@ -161,4 +161,4 @@ type Context interface {
 type HandlerFunc func(Context) error
 
 // MiddlewareFunc defines a function to process middleware
-type MiddlewareFunc func(HandlerFunc) HandlerFunc
+type MiddlewareFunc func(next HandlerFunc) HandlerFunc

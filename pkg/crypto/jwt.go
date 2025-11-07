@@ -204,6 +204,16 @@ func (m *JWTManager) ParseToken(tokenString string) (*Claims, error) {
 	return claims, nil
 }
 
+// GetAccessTokenExpiry returns the access token expiry duration
+func (m *JWTManager) GetAccessTokenExpiry() time.Duration {
+	return m.config.AccessTokenExpiry
+}
+
+// GetRefreshTokenExpiry returns the refresh token expiry duration
+func (m *JWTManager) GetRefreshTokenExpiry() time.Duration {
+	return m.config.RefreshTokenExpiry
+}
+
 // ValidateToken validates a JWT token without parsing claims
 func (m *JWTManager) ValidateToken(tokenString string) error {
 	_, err := m.ParseToken(tokenString)

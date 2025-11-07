@@ -13,7 +13,7 @@ type Identifier struct {
 }
 
 // SignInRequest DTO for user authentication
-// Supports node-infra style with identifier/credential schemes.
+// Identifier/credential schemes.
 // Schemes are required and must be explicitly specified.
 //
 // Example payload:
@@ -29,7 +29,6 @@ type Identifier struct {
 //		}
 //	}
 type SignInRequest struct {
-	// Node-infra style fields
 	Identifier *Identifier `json:"identifier" validate:"required"`
 	Credential *Credential `json:"credential" validate:"required"`
 	ClientID   string      `json:"clientId,omitempty"` // optional client ID for multi-tenant scenarios

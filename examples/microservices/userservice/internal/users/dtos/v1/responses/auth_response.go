@@ -6,7 +6,7 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
-// TokenInfo represents token details matching node-infra token structure
+// TokenInfo represents token details
 type TokenInfo struct {
 	Value     string    `json:"value"`
 	Scheme    string    `json:"scheme"` // e.g., "bearer"
@@ -15,7 +15,6 @@ type TokenInfo struct {
 }
 
 // AuthResponse DTO for authentication responses (signup/signin)
-// Matches node-infra response structure with token and user information
 type AuthResponse struct {
 	UserID       uuid.UUID  `json:"userId"`
 	Username     string     `json:"username,omitempty"`
@@ -24,6 +23,6 @@ type AuthResponse struct {
 	Status       string     `json:"status,omitempty"`   // user status
 	UserType     string     `json:"userType,omitempty"` // default: "user"
 	CreatedAt    time.Time  `json:"createdAt,omitempty"`
-	AccessToken  *TokenInfo `json:"token,omitempty"`        // main token (for node-infra compat as "token")
+	AccessToken  *TokenInfo `json:"token,omitempty"`
 	RefreshToken *TokenInfo `json:"refreshToken,omitempty"` // refresh token
 }

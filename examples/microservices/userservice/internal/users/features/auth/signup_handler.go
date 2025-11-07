@@ -85,7 +85,6 @@ func (h *signUpHandler) handler() contracts.HandlerFunc {
 			})
 		}
 
-		// Build response matching node-infra structure
 		resp := &responses.AuthResponse{
 			UserID:    result.UserID,
 			Username:  req.Username,

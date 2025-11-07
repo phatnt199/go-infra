@@ -3,9 +3,7 @@ package requests
 import uuid "github.com/satori/go.uuid"
 
 // ChangePasswordRequest DTO for changing password
-// Supports both node-infra style (oldCredential/newCredential with schemes) and simple oldPassword/newPassword
 type ChangePasswordRequest struct {
-	// Node-infra style fields
 	OldCredential *Credential `json:"oldCredential,omitempty"`
 	NewCredential *Credential `json:"newCredential,omitempty"`
 

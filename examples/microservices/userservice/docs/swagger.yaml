@@ -6,9 +6,7 @@ definitions:
       newPassword:
         type: string
       oldCredential:
-        allOf:
-        - $ref: '#/definitions/requests.Credential'
-        description: Node-infra style fields
+        $ref: '#/definitions/requests.Credential'
       oldPassword:
         description: Simple style (for backwards compatibility)
         type: string
@@ -41,9 +39,7 @@ definitions:
       credential:
         $ref: '#/definitions/requests.Credential'
       identifier:
-        allOf:
-        - $ref: '#/definitions/requests.Identifier'
-        description: Node-infra style fields
+        $ref: '#/definitions/requests.Identifier'
     required:
     - credential
     - identifier
@@ -56,8 +52,7 @@ definitions:
       credential:
         allOf:
         - $ref: '#/definitions/requests.Credential'
-        description: Node-infra compatibility - for credential object if provided
-          instead of plain password
+        description: For credential object if provided instead of plain password
       firstname:
         description: Profile fields - can be omitted, will use defaults if not provided
         maxLength: 100
@@ -109,9 +104,7 @@ definitions:
         description: user status
         type: string
       token:
-        allOf:
-        - $ref: '#/definitions/responses.TokenInfo'
-        description: main token (for node-infra compat as "token")
+        $ref: '#/definitions/responses.TokenInfo'
       userId:
         type: string
       userType:

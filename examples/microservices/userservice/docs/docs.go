@@ -342,12 +342,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "oldCredential": {
-                    "description": "Node-infra style fields",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/requests.Credential"
-                        }
-                    ]
+                    "$ref": "#/definitions/requests.Credential"
                 },
                 "oldPassword": {
                     "description": "Simple style (for backwards compatibility)",
@@ -400,12 +395,7 @@ const docTemplate = `{
                     "$ref": "#/definitions/requests.Credential"
                 },
                 "identifier": {
-                    "description": "Node-infra style fields",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/requests.Identifier"
-                        }
-                    ]
+                    "$ref": "#/definitions/requests.Identifier"
                 }
             }
         },
@@ -421,7 +411,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "credential": {
-                    "description": "Node-infra compatibility - for credential object if provided instead of plain password",
+                    "description": "For credential object if provided instead of plain password",
                     "allOf": [
                         {
                             "$ref": "#/definitions/requests.Credential"
@@ -497,12 +487,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "token": {
-                    "description": "main token (for node-infra compat as \"token\")",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/responses.TokenInfo"
-                        }
-                    ]
+                    "$ref": "#/definitions/responses.TokenInfo"
                 },
                 "userId": {
                     "type": "string"

@@ -1,7 +1,7 @@
 package requests
 
 // SignUpRequest DTO for user registration
-// Supports node-infra style with identifier/credential and additional profile fields
+// Identifier/credential and additional profile fields
 type SignUpRequest struct {
 	// Required fields
 	Username string `json:"username" validate:"required,min=3,max=50"`
@@ -13,7 +13,7 @@ type SignUpRequest struct {
 	Birthday  string `json:"birthday,omitempty" validate:"omitempty"`     // ISO format: YYYY-MM-DD
 	Locale    string `json:"locale,omitempty" validate:"omitempty,len=5"` // e.g., en_US, vi_VN
 
-	// Node-infra compatibility - for credential object if provided instead of plain password
+	// For credential object if provided instead of plain password
 	Credential *Credential `json:"credential,omitempty"`
 
 	// Additional dynamic fields (JSON passthrough)

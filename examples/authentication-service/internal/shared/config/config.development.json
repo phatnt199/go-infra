@@ -1,0 +1,45 @@
+{
+  "appOptions": {
+    "serviceName": "auth2-service",
+    "deliveryType": "http"
+  },
+  "fiberHttpOptions": {
+    "port": ":8081",
+    "host": "localhost",
+    "basePath": "/api/v1",
+    "name": "Auth Service",
+    "development": true,
+    "timeout": 30
+  },
+  "gormOptions": {
+    "type": 0,
+    "host": "localhost",
+    "port": 54100,
+    "user": "admin",
+    "password": "123456",
+    "dbName": "go-sandbox",
+    "sslmode": false,
+    "enable_tracing": false
+  },
+  "logOptions": {
+    "level": "info",
+    "logType": 0,
+    "callerEnabled": true,
+    "enableTracing": true
+  },
+  "migrationOptions": {
+    "host": "localhost",
+    "port": 54100,
+    "user": "admin",
+    "password": "123456",
+    "dbName": "go-sandbox",
+    "sslMode": false,
+    "migrationsDir": "db/migrations/goose-migrate",
+    "skipMigration": false
+  },
+  "jwtOptions": {
+    "secret": "your-secret-key",
+    "accessTokenExpiration": 3600,
+    "refreshTokenExpiration": 86400
+  }
+}

@@ -12,9 +12,9 @@ type User struct {
 	ID        uuid.UUID      `json:"id" gorm:"type:uuid;primary_key;default:gen_random_uuid()"`
 	Name      string         `json:"name" gorm:"type:varchar(255);not null"`
 	Email     string         `json:"email" gorm:"type:varchar(255);not null;unique"`
-	CreatedAt time.Time      `json:"created_at"`
-	UpdatedAt time.Time      `json:"updated_at"`
-	DeletedAt gorm.DeletedAt `json:"-" gorm:"index"`
+	CreatedAt time.Time      `json:"created_at" gorm:"type:timestamptz"`
+	UpdatedAt time.Time      `json:"updated_at" gorm:"type:timestamptz"`
+	DeletedAt gorm.DeletedAt `json:"-" gorm:"index;type:timestamptz"`
 }
 
 // TableName specifies the table name for User model

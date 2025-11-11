@@ -1,0 +1,469 @@
+basePath: /api/v1
+definitions:
+  github_com_phatnt199_go-infra_pkg_component_authentication_models.Credential:
+    properties:
+      scheme:
+        example: basic
+        type: string
+      value:
+        example: pass123
+        type: string
+    required:
+    - scheme
+    - value
+    type: object
+  github_com_phatnt199_go-infra_pkg_component_authentication_models.Identifier:
+    properties:
+      scheme:
+        example: username
+        type: string
+      value:
+        example: john
+        type: string
+    required:
+    - scheme
+    - value
+    type: object
+  github_com_phatnt199_go-infra_pkg_component_authentication_models.TokenInfo:
+    properties:
+      expiresAt:
+        example: "2024-12-31T23:59:59Z"
+        type: string
+      scheme:
+        example: bearer
+        type: string
+      type:
+        example: access
+        type: string
+      value:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        type: string
+    type: object
+  models.AuthResponse:
+    description: Authentication response with user info and tokens
+    properties:
+      createdAt:
+        example: "2024-01-01T00:00:00Z"
+        type: string
+      email:
+        example: john@example.com
+        type: string
+      firstname:
+        example: John
+        type: string
+      lastname:
+        example: Doe
+        type: string
+      refreshToken:
+        $ref: '#/definitions/github_com_phatnt199_go-infra_pkg_component_authentication_models.TokenInfo'
+      status:
+        example: active
+        type: string
+      token:
+        $ref: '#/definitions/github_com_phatnt199_go-infra_pkg_component_authentication_models.TokenInfo'
+      userId:
+        example: 123e4567-e89b-12d3-a456-426614174000
+        type: string
+      userType:
+        example: user
+        type: string
+      username:
+        example: john
+        type: string
+    type: object
+  models.ChangePasswordRequest:
+    description: Change password using credential pattern
+    properties:
+      clientId:
+        example: web-app
+        type: string
+      newCredential:
+        $ref: '#/definitions/github_com_phatnt199_go-infra_pkg_component_authentication_models.Credential'
+      oldCredential:
+        $ref: '#/definitions/github_com_phatnt199_go-infra_pkg_component_authentication_models.Credential'
+    required:
+    - newCredential
+    - oldCredential
+    type: object
+  models.MessageResponse:
+    description: Standard message response
+    properties:
+      message:
+        example: Operation completed successfully
+        type: string
+      success:
+        example: true
+        type: boolean
+    type: object
+  models.SignInRequest:
+    description: Authentication request using identifier/credential pattern Schemes
+      must be explicitly specified
+    properties:
+      clientId:
+        example: web-app
+        type: string
+      credential:
+        $ref: '#/definitions/github_com_phatnt199_go-infra_pkg_component_authentication_models.Credential'
+      identifier:
+        $ref: '#/definitions/github_com_phatnt199_go-infra_pkg_component_authentication_models.Identifier'
+    required:
+    - credential
+    - identifier
+    type: object
+  models.SignUpRequest:
+    description: User registration using identifier/credential pattern
+    properties:
+      birthday:
+        example: "1990-01-01"
+        type: string
+      clientId:
+        example: web-app
+        type: string
+      credential:
+        $ref: '#/definitions/github_com_phatnt199_go-infra_pkg_component_authentication_models.Credential'
+      email:
+        example: john@example.com
+        type: string
+      firstname:
+        description: Profile fields
+        example: John
+        maxLength: 100
+        type: string
+      identifier:
+        $ref: '#/definitions/github_com_phatnt199_go-infra_pkg_component_authentication_models.Identifier'
+      lastname:
+        example: Doe
+        maxLength: 100
+        type: string
+      locale:
+        example: en_US
+        type: string
+    required:
+    - credential
+    - identifier
+    type: object
+  models.UpdateProfileRequest:
+    description: Update user profile information
+    properties:
+      birthday:
+        example: "1990-01-01"
+        type: string
+      email:
+        example: john@example.com
+        type: string
+      firstname:
+        example: John
+        maxLength: 100
+        type: string
+      lastname:
+        example: Doe
+        maxLength: 100
+        type: string
+      locale:
+        example: en_US
+        type: string
+      metadata:
+        additionalProperties: true
+        type: object
+    type: object
+  models.UserResponse:
+    description: User profile information
+    properties:
+      birthday:
+        example: "1990-01-01T00:00:00Z"
+        type: string
+      createdAt:
+        example: "2024-01-01T00:00:00Z"
+        type: string
+      email:
+        example: john@example.com
+        type: string
+      firstname:
+        example: John
+        type: string
+      lastname:
+        example: Doe
+        type: string
+      locale:
+        example: en_US
+        type: string
+      metadata:
+        additionalProperties: true
+        type: object
+      status:
+        example: active
+        type: string
+      userId:
+        example: 123e4567-e89b-12d3-a456-426614174000
+        type: string
+      userType:
+        example: user
+        type: string
+      username:
+        example: john
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: Authentication service using identifier/credential pattern
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  termsOfService: http://swagger.io/terms/
+  title: Authentication Service API
+  version: "1.0"
+paths:
+  /api/v1/admin/dashboard:
+    get:
+      description: Endpoint accessible only to admin users (requires authentication
+        with admin role)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Admin data
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.MessageResponse'
+        "403":
+          description: Forbidden - Admin role required
+          schema:
+            $ref: '#/definitions/models.MessageResponse'
+      security:
+      - BearerAuth: []
+      summary: Admin only endpoint
+      tags:
+      - admin
+  /api/v1/auth/change-password:
+    put:
+      consumes:
+      - application/json
+      description: Change password using old/new credential pattern (requires authentication)
+      parameters:
+      - description: Change password request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.ChangePasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/models.MessageResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/models.MessageResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.MessageResponse'
+      security:
+      - BearerAuth: []
+      summary: Change user password
+      tags:
+      - auth
+  /api/v1/auth/profile:
+    get:
+      description: Get authenticated user profile information (requires authentication)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/models.UserResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.MessageResponse'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/models.MessageResponse'
+      security:
+      - BearerAuth: []
+      summary: Get user profile
+      tags:
+      - auth
+    put:
+      consumes:
+      - application/json
+      description: Update authenticated user profile information (requires authentication)
+      parameters:
+      - description: Update profile request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateProfileRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/models.UserResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/models.MessageResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.MessageResponse'
+      security:
+      - BearerAuth: []
+      summary: Update user profile
+      tags:
+      - auth
+  /api/v1/auth/signin:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate with identifier/credential pattern
+      parameters:
+      - description: Sign in request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.SignInRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/models.AuthResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/models.MessageResponse'
+        "401":
+          description: Invalid credentials
+          schema:
+            $ref: '#/definitions/models.MessageResponse'
+      summary: Sign in user
+      tags:
+      - auth
+  /api/v1/auth/signup:
+    post:
+      consumes:
+      - application/json
+      description: Register new user with identifier/credential pattern
+      parameters:
+      - description: Sign up request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.SignUpRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Success
+          schema:
+            $ref: '#/definitions/models.AuthResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/models.MessageResponse'
+        "409":
+          description: User already exists
+          schema:
+            $ref: '#/definitions/models.MessageResponse'
+      summary: Sign up new user
+      tags:
+      - auth
+  /api/v1/protected/dashboard:
+    get:
+      description: Get dashboard data for authenticated user (requires authentication)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Dashboard data
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.MessageResponse'
+      security:
+      - BearerAuth: []
+      summary: Get user dashboard
+      tags:
+      - protected
+  /api/v1/protected/settings:
+    get:
+      description: Get settings for authenticated user (requires authentication)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User settings
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.MessageResponse'
+      security:
+      - BearerAuth: []
+      summary: Get user settings
+      tags:
+      - protected
+    put:
+      consumes:
+      - application/json
+      description: Update settings for authenticated user (requires authentication)
+      parameters:
+      - description: Settings to update
+        in: body
+        name: settings
+        required: true
+        schema:
+          additionalProperties: true
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Settings updated
+          schema:
+            $ref: '#/definitions/models.MessageResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/models.MessageResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.MessageResponse'
+      security:
+      - BearerAuth: []
+      summary: Update user settings
+      tags:
+      - protected
+securityDefinitions:
+  BearerAuth:
+    description: Type "Bearer" followed by a space and JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

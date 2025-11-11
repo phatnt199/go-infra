@@ -1,0 +1,50 @@
+{
+  "appOptions": {
+    "serviceName": "authentication-service",
+    "deliveryType": "http"
+  },
+  "fiberHttpOptions": {
+    "host": "0.0.0.0",
+    "port": ":8081",
+    "basePath": "/api/v1",
+    "name": "Authentication Service",
+    "development": true,
+    "timeout": 30
+  },
+  "gormOptions": {
+    "type": 0,
+    "host": "localhost",
+    "port": 54100,
+    "user": "admin",
+    "password": "123456",
+    "dbName": "auth_db",
+    "sslmode": false,
+    "enableTracing": false
+  },
+  "logOptions": {
+    "level": "info",
+    "logType": 0,
+    "callerEnabled": true,
+    "enableTracing": true
+  },
+  "migrationOptions": {
+    "host": "localhost",
+    "port": 54100,
+    "user": "admin",
+    "password": "123456",
+    "dbName": "auth_db",
+    "sslMode": false,
+    "migrationsDir": "db/migrations",
+    "skipMigration": false
+  },
+  "authOptions": {
+    "jwt": {
+      "secret": "your-secret-key-change-in-production",
+      "issuer": "authentication-service",
+      "audience": "authentication-api",
+      "algorithm": "HS256",
+      "accessExpiry": "15m",
+      "refreshExpiry": "168h"
+    }
+  }
+}

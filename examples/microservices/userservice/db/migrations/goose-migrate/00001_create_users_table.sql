@@ -3,16 +3,16 @@
 -- Create users table
 CREATE TABLE IF NOT EXISTS users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    modified_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted_at TIMESTAMP,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    modified_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted_at TIMESTAMPTZ,
     status VARCHAR(20) NOT NULL DEFAULT '100_ACTIVATE',
     user_type VARCHAR(10) NOT NULL DEFAULT 'SYSTEM',
-    activated_at TIMESTAMP,
-    last_login_at TIMESTAMP,
+    activated_at TIMESTAMPTZ,
+    last_login_at TIMESTAMPTZ,
     parent_id UUID,
-    valid_from TIMESTAMP,
-    valid_to TIMESTAMP,
+    valid_from TIMESTAMPTZ,
+    valid_to TIMESTAMPTZ,
     CONSTRAINT fk_users_parent FOREIGN KEY (parent_id) REFERENCES users (id) ON DELETE SET NULL
 );
 
@@ -30,9 +30,9 @@ WHERE
 CREATE TABLE IF NOT EXISTS user_identifiers (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
     user_id UUID NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    modified_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted_at TIMESTAMP,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    modified_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted_at TIMESTAMPTZ,
     scheme VARCHAR(50) NOT NULL DEFAULT 'username',
     identifier VARCHAR(255) NOT NULL,
     verified BOOLEAN NOT NULL DEFAULT TRUE,
@@ -54,9 +54,9 @@ WHERE
 CREATE TABLE IF NOT EXISTS user_credentials (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
     user_id UUID NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    modified_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted_at TIMESTAMP,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    modified_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted_at TIMESTAMPTZ,
     scheme VARCHAR(50) NOT NULL DEFAULT 'basic',
     credential VARCHAR(255) NOT NULL,
     details JSONB DEFAULT '{}',
@@ -77,9 +77,9 @@ WHERE
 CREATE TABLE IF NOT EXISTS user_profiles (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
     user_id UUID NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    modified_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted_at TIMESTAMP,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    modified_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted_at TIMESTAMPTZ,
     firstname VARCHAR(255),
     lastname VARCHAR(255),
     birthday DATE,

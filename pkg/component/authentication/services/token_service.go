@@ -5,82 +5,71 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/phatnt199/go-infra/pkg/component/authentication/config"
 	"github.com/phatnt199/go-infra/pkg/component/authentication/contracts"
 )
 
-// tokenService implements ITokenService
-type tokenService struct {
-	secret             string
-	issuer             string
-	audience           string
-	algorithm          string
-	accessTokenExpiry  time.Duration
-	refreshTokenExpiry time.Duration
+// TokenService implements ITokenService
+type TokenService struct {
+	config *config.JWTConfig
 }
 
-// NewTokenService creates a new token service
-func NewTokenService(
-	secret, issuer, audience, algorithm string,
-	accessExpiry, refreshExpiry time.Duration,
-) contracts.ITokenService {
-	return &tokenService{
-		secret:             secret,
-		issuer:             issuer,
-		audience:           audience,
-		algorithm:          algorithm,
-		accessTokenExpiry:  accessExpiry,
-		refreshTokenExpiry: refreshExpiry,
+// NewTokenService creates a new token service from JWT config
+func NewTokenService(cfg *config.JWTConfig) contracts.ITokenService {
+	return &TokenService{
+		config: cfg,
 	}
 }
 
-// Claims represents JWT claims
+// Claims represents JWT claims (same as strategies.JWTClaims for consistency)
 type Claims struct {
 	UserID   string   `json:"userId"`
 	Username string   `json:"username"`
 	Roles    []string `json:"roles,omitempty"`
+	ClientID string   `json:"clientId,omitempty"`
 	Type     string   `json:"type"` // access or refresh
 	jwt.RegisteredClaims
 }
 
 // GenerateAccessToken generates an access token
-func (s *tokenService) GenerateAccessToken(userID, username string, roles []string) (string, error) {
+func (s *TokenService) GenerateAccessToken(userID, username string, roles []string) (string, error) {
 	claims := Claims{
 		UserID:   userID,
 		Username: username,
 		Roles:    roles,
 		Type:     "access",
 		RegisteredClaims: jwt.RegisteredClaims{
-			Issuer:    s.issuer,
-			Audience:  jwt.ClaimStrings{s.audience},
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(s.accessTokenExpiry)),
+			Issuer:    s.config.Issuer,
+			Audience:  jwt.ClaimStrings{s.config.Audience},
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(s.config.AccessExpiry)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 		},
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString([]byte(s.secret))
+	return token.SignedString([]byte(s.config.Secret))
 }
 
 // GenerateRefreshToken generates a refresh token
-func (s *tokenService) GenerateRefreshToken(userID, username string) (string, error) {
+func (s *TokenService) GenerateRefreshToken(userID, username string) (string, error) {
 	claims := Claims{
 		UserID:   userID,
 		Username: username,
 		Type:     "refresh",
 		RegisteredClaims: jwt.RegisteredClaims{
-			Issuer:    s.issuer,
-			Audience:  jwt.ClaimStrings{s.audience},
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(s.refreshTokenExpiry)),
+			Issuer:    s.config.Issuer,
+			Audience:  jwt.ClaimStrings{s.config.Audience},
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(s.config.RefreshExpiry)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 		},
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString([]byte(s.secret))
+	return token.SignedString([]byte(s.config.Secret))
 }
 
 // GenerateTokenPair generates both access and refresh tokens
-func (s *tokenService) GenerateTokenPair(userID, username string, roles []string) (string, string, error) {
+func (s *TokenService) GenerateTokenPair(userID, username string, roles []string) (string, string, error) {
 	accessToken, err := s.GenerateAccessToken(userID, username, roles)
 	if err != nil {
 		return "", "", err
@@ -95,12 +84,12 @@ func (s *tokenService) GenerateTokenPair(userID, username string, roles []string
 }
 
 // ValidateAccessToken validates an access token and returns claims
-func (s *tokenService) ValidateAccessToken(tokenString string) (string, string, []string, error) {
+func (s *TokenService) ValidateAccessToken(tokenString string) (string, string, []string, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
-		return []byte(s.secret), nil
+		return []byte(s.config.Secret), nil
 	})
 
 	if err != nil {
@@ -118,12 +107,12 @@ func (s *tokenService) ValidateAccessToken(tokenString string) (string, string, 
 }
 
 // ValidateRefreshToken validates a refresh token
-func (s *tokenService) ValidateRefreshToken(tokenString string) (string, string, error) {
+func (s *TokenService) ValidateRefreshToken(tokenString string) (string, string, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
-		return []byte(s.secret), nil
+		return []byte(s.config.Secret), nil
 	})
 
 	if err != nil {
@@ -141,11 +130,11 @@ func (s *tokenService) ValidateRefreshToken(tokenString string) (string, string,
 }
 
 // GetAccessTokenExpiry returns access token expiry duration
-func (s *tokenService) GetAccessTokenExpiry() time.Duration {
-	return s.accessTokenExpiry
+func (s *TokenService) GetAccessTokenExpiry() time.Duration {
+	return s.config.AccessExpiry
 }
 
 // GetRefreshTokenExpiry returns refresh token expiry duration
-func (s *tokenService) GetRefreshTokenExpiry() time.Duration {
-	return s.refreshTokenExpiry
+func (s *TokenService) GetRefreshTokenExpiry() time.Duration {
+	return s.config.RefreshExpiry
 }

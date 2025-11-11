@@ -1,23 +1,20 @@
 package app
 
 import (
-	"fmt"
-
 	"github.com/gofiber/fiber/v2"
+	"github.com/phatnt199/go-infra/examples/authentication-service/config"
 	"github.com/phatnt199/go-infra/examples/authentication-service/docs"
 	"github.com/phatnt199/go-infra/examples/authentication-service/internal/auth"
-	"github.com/phatnt199/go-infra/examples/authentication-service/internal/auth/models"
-	"github.com/phatnt199/go-infra/examples/authentication-service/internal/shared/config"
+	"github.com/phatnt199/go-infra/examples/authentication-service/internal/shared/data"
 	"github.com/phatnt199/go-infra/pkg/adapter/fxapp"
 	"github.com/phatnt199/go-infra/pkg/adapter/fxapp/contracts"
 	httpContracts "github.com/phatnt199/go-infra/pkg/adapter/http/contracts"
 	fiberAdapter "github.com/phatnt199/go-infra/pkg/adapter/http/fiber_adapter"
-	"github.com/phatnt199/go-infra/pkg/component/authentication"
+	authComponent "github.com/phatnt199/go-infra/pkg/component/authentication"
 	"github.com/phatnt199/go-infra/pkg/health"
+	postgresgorm "github.com/phatnt199/go-infra/pkg/infra/postgres/gorm"
 	"github.com/phatnt199/go-infra/pkg/logger"
-	"go.uber.org/fx"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
+	"github.com/phatnt199/go-infra/pkg/migration/goose"
 
 	fiberSwagger "github.com/swaggo/fiber-swagger"
 )
@@ -27,61 +24,23 @@ type Application struct {
 }
 
 func NewApplication() *Application {
-	// Load custom configuration
-	cfg, err := config.LoadConfig()
-	if err != nil {
-		panic(fmt.Sprintf("Failed to load config: %v", err))
-	}
-
 	// Create application builder with base fx modules
 	builder := fxapp.NewApplicationBuilder()
 
-	// Provide custom configuration
-	builder.ProvideModule(fx.Module(
-		"configfx",
-		fx.Provide(func() *config.Config {
-			return cfg
-		}),
-	))
-
-	// Provide database
-	builder.ProvideModule(fx.Module(
-		"dbfx",
-		fx.Provide(func() (*gorm.DB, error) {
-			dsn := fmt.Sprintf(
-				"host=%s port=%d user=%s password=%s dbname=%s sslmode=%s",
-				cfg.Database.Host,
-				cfg.Database.Port,
-				cfg.Database.User,
-				cfg.Database.Password,
-				cfg.Database.Name,
-				cfg.Database.SSLMode,
-			)
-
-			db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-			if err != nil {
-				return nil, fmt.Errorf("failed to connect database: %w", err)
-			}
-
-			sqlDB, err := db.DB()
-			if err != nil {
-				return nil, err
-			}
-
-			sqlDB.SetMaxOpenConns(cfg.Database.MaxOpenConns)
-			sqlDB.SetMaxIdleConns(cfg.Database.MaxIdleConns)
-
-			// Auto migrate
-			if err := db.AutoMigrate(&models.User{}); err != nil {
-				return nil, fmt.Errorf("failed to migrate database: %w", err)
-			}
-
-			return db, nil
-		}),
-	))
+	// Include configuration module
+	builder.ProvideModule(config.Module)
 
 	// Include Fiber HTTP server module
 	builder.ProvideModule(fiberAdapter.Module)
+
+	// Include PostgreSQL GORM module
+	builder.ProvideModule(postgresgorm.Module)
+
+	// Include migration module
+	builder.ProvideModule(goose.Module)
+
+	// Include data module
+	builder.ProvideModule(data.Module)
 
 	// Include health module
 	builder.ProvideModule(health.Module)
@@ -120,16 +79,33 @@ func NewApplication() *Application {
 	app.RegisterHook(registerSwagger)
 
 	// Register authentication endpoints as a hook
-	registerAuthentication := func(authenticationPlugin *authentication.AuthenticationPlugin, server httpContracts.HttpServer, log logger.Logger) {
-		authenticationPlugin.SetLogger(log)
-
+	registerAuthentication := func(authComp *authComponent.Component, server httpContracts.HttpServer, log logger.Logger) {
 		// Create the auth route group with the basePath
 		basePath := server.Cfg().GetBasePath()
 		v1Group := server.RouteBuilder().Group(basePath)
 		authGroup := v1Group.Group("/auth")
 
-		// Register authentication routes on the group
-		authenticationPlugin.RegisterGroup(authGroup)
+		// Create handler factory from component
+		handlerFactory := authComp.GetHandlerFactory()
+
+		// Get JWT middleware from component for protected routes
+		jwtMiddleware := authComp.GetJWTMiddleware()
+
+		// Register authentication endpoints using handler factory
+		// Sign Up: POST /auth/signup (public)
+		authGroup.POST("/signup", handlerFactory.SignUp())
+
+		// Sign In: POST /auth/signin (public)
+		authGroup.POST("/signin", handlerFactory.SignIn())
+
+		// Change Password: PUT /auth/change-password (requires authentication)
+		authGroup.PUT("/change-password", handlerFactory.ChangePassword(), jwtMiddleware.Handle())
+
+		// Get Profile: GET /auth/profile (requires authentication)
+		authGroup.GET("/profile", handlerFactory.GetProfile(), jwtMiddleware.Handle())
+
+		// Update Profile: PUT /auth/profile (requires authentication)
+		authGroup.PUT("/profile", handlerFactory.UpdateProfile(), jwtMiddleware.Handle())
 
 		log.Info("Authentication endpoints registered successfully")
 	}

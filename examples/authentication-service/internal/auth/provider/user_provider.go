@@ -6,18 +6,18 @@ import (
 
 	"github.com/phatnt199/go-infra/examples/authentication-service/internal/auth/models"
 	authContracts "github.com/phatnt199/go-infra/pkg/component/authentication/contracts"
+	"github.com/phatnt199/go-infra/pkg/infra/postgres/gorm/contracts"
 	uuid "github.com/satori/go.uuid"
-	"gorm.io/gorm"
 )
 
 // UserProvider implements IUserProvider interface
 type UserProvider struct {
-	db *gorm.DB
+	dbContext contracts.GormDBContext
 }
 
 // NewUserProvider creates a new user provider
-func NewUserProvider(db *gorm.DB) authContracts.IUserProvider {
-	return &UserProvider{db: db}
+func NewUserProvider(dbContext contracts.GormDBContext) authContracts.IUserProvider {
+	return &UserProvider{dbContext: dbContext}
 }
 
 // GetUserByIdentifier finds a user by identifier (username, email, phone, etc.)
@@ -27,12 +27,12 @@ func (p *UserProvider) GetUserByIdentifier(ctx context.Context, scheme, value st
 
 	switch scheme {
 	case "username":
-		err = p.db.WithContext(ctx).Where("username = ?", value).First(&user).Error
+		err = p.dbContext.DB().WithContext(ctx).Where("username = ?", value).First(&user).Error
 	case "email":
-		err = p.db.WithContext(ctx).Where("email = ?", value).First(&user).Error
+		err = p.dbContext.DB().WithContext(ctx).Where("email = ?", value).First(&user).Error
 	case "phone":
 		// Assuming phone is stored in metadata or a separate column
-		err = p.db.WithContext(ctx).Where("metadata->>'phone' = ?", value).First(&user).Error
+		err = p.dbContext.DB().WithContext(ctx).Where("metadata->>'phone' = ?", value).First(&user).Error
 	default:
 		return nil, fmt.Errorf("unsupported identifier scheme: %s", scheme)
 	}
@@ -67,7 +67,7 @@ func (p *UserProvider) CreateUser(ctx context.Context, req *authContracts.Create
 		user.UserType = "user"
 	}
 
-	err := p.db.WithContext(ctx).Create(user).Error
+	err := p.dbContext.DB().WithContext(ctx).Create(user).Error
 	if err != nil {
 		return nil, err
 	}
@@ -82,7 +82,7 @@ func (p *UserProvider) UpdatePassword(ctx context.Context, userID, newPasswordHa
 		return fmt.Errorf("invalid user ID: %w", err)
 	}
 
-	return p.db.WithContext(ctx).Model(&models.User{}).
+	return p.dbContext.DB().WithContext(ctx).Model(&models.User{}).
 		Where("id = ?", uid).
 		Update("password", newPasswordHash).Error
 }
@@ -95,7 +95,7 @@ func (p *UserProvider) GetUserByID(ctx context.Context, userID string) (*authCon
 	}
 
 	var user models.User
-	err = p.db.WithContext(ctx).Where("id = ?", uid).First(&user).Error
+	err = p.dbContext.DB().WithContext(ctx).Where("id = ?", uid).First(&user).Error
 	if err != nil {
 		return nil, err
 	}
@@ -130,7 +130,7 @@ func (p *UserProvider) UpdateProfile(ctx context.Context, req *authContracts.Upd
 		updates["metadata"] = req.Metadata
 	}
 
-	err = p.db.WithContext(ctx).Model(&models.User{}).Where("id = ?", uid).Updates(updates).Error
+	err = p.dbContext.DB().WithContext(ctx).Model(&models.User{}).Where("id = ?", uid).Updates(updates).Error
 	if err != nil {
 		return nil, err
 	}

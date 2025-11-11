@@ -11,12 +11,12 @@ import (
 	"github.com/phatnt199/go-infra/pkg/logger"
 )
 
-// authService implements IAuthService
-type authService struct {
+// AuthService implements IAuthService
+type AuthService struct {
 	userProvider   contracts.IUserProvider
 	tokenService   contracts.ITokenService
-	passwordHasher contracts.IPasswordHasher
-	config         *config.AuthConfig
+	passwordHasher IPasswordHasher
+	config         *config.Config
 	logger         logger.Logger
 }
 
@@ -24,21 +24,21 @@ type authService struct {
 func NewAuthService(
 	userProvider contracts.IUserProvider,
 	tokenService contracts.ITokenService,
-	passwordHasher contracts.IPasswordHasher,
-	config *config.AuthConfig,
+	passwordHasher IPasswordHasher,
+	cfg *config.Config,
 	logger logger.Logger,
 ) contracts.IAuthService {
-	return &authService{
+	return &AuthService{
 		userProvider:   userProvider,
 		tokenService:   tokenService,
 		passwordHasher: passwordHasher,
-		config:         config,
+		config:         cfg,
 		logger:         logger,
 	}
 }
 
 // SignUp creates a new user with credentials and profile
-func (s *authService) SignUp(ctx context.Context, req *models.SignUpRequest) (*models.AuthResponse, error) {
+func (s *AuthService) SignUp(ctx context.Context, req *models.SignUpRequest) (*models.AuthResponse, error) {
 	// Validate identifier scheme
 	if !s.isValidIdentifierScheme(req.Identifier.Scheme) {
 		return nil, fmt.Errorf("unsupported identifier scheme: %s", req.Identifier.Scheme)
@@ -50,8 +50,8 @@ func (s *authService) SignUp(ctx context.Context, req *models.SignUpRequest) (*m
 	}
 
 	// Validate password length
-	if len(req.GetCredentialValue()) < s.config.MinPasswordLength {
-		return nil, fmt.Errorf("password must be at least %d characters", s.config.MinPasswordLength)
+	if len(req.GetCredentialValue()) < s.config.Password.MinLength {
+		return nil, fmt.Errorf("password must be at least %d characters", s.config.Password.MinLength)
 	}
 
 	// Check if user already exists
@@ -126,7 +126,7 @@ func (s *authService) SignUp(ctx context.Context, req *models.SignUpRequest) (*m
 }
 
 // SignIn authenticates a user and returns JWT tokens
-func (s *authService) SignIn(ctx context.Context, req *models.SignInRequest) (*models.AuthResponse, error) {
+func (s *AuthService) SignIn(ctx context.Context, req *models.SignInRequest) (*models.AuthResponse, error) {
 	// Validate identifier scheme
 	if !s.isValidIdentifierScheme(req.Identifier.Scheme) {
 		return nil, fmt.Errorf("unsupported identifier scheme: %s", req.Identifier.Scheme)
@@ -186,7 +186,7 @@ func (s *authService) SignIn(ctx context.Context, req *models.SignInRequest) (*m
 }
 
 // ChangePassword changes user password
-func (s *authService) ChangePassword(ctx context.Context, req *models.ChangePasswordRequest) error {
+func (s *AuthService) ChangePassword(ctx context.Context, req *models.ChangePasswordRequest) error {
 	// Validate credential schemes
 	if !s.isValidCredentialScheme(req.OldCredential.Scheme) {
 		return fmt.Errorf("unsupported credential scheme: %s", req.OldCredential.Scheme)
@@ -196,8 +196,8 @@ func (s *authService) ChangePassword(ctx context.Context, req *models.ChangePass
 	}
 
 	// Validate new password length
-	if len(req.GetNewPassword()) < s.config.MinPasswordLength {
-		return fmt.Errorf("password must be at least %d characters", s.config.MinPasswordLength)
+	if len(req.GetNewPassword()) < s.config.Password.MinLength {
+		return fmt.Errorf("password must be at least %d characters", s.config.Password.MinLength)
 	}
 
 	// Get user
@@ -228,7 +228,7 @@ func (s *authService) ChangePassword(ctx context.Context, req *models.ChangePass
 }
 
 // GetProfile gets user profile information
-func (s *authService) GetProfile(ctx context.Context, userID string) (*models.UserResponse, error) {
+func (s *AuthService) GetProfile(ctx context.Context, userID string) (*models.UserResponse, error) {
 	user, err := s.userProvider.GetUserByID(ctx, userID)
 	if err != nil {
 		return nil, fmt.Errorf("user not found")
@@ -250,7 +250,7 @@ func (s *authService) GetProfile(ctx context.Context, userID string) (*models.Us
 }
 
 // UpdateProfile updates user profile information
-func (s *authService) UpdateProfile(ctx context.Context, req *models.UpdateProfileRequest) (*models.UserResponse, error) {
+func (s *AuthService) UpdateProfile(ctx context.Context, req *models.UpdateProfileRequest) (*models.UserResponse, error) {
 	// Parse birthday if provided
 	var birthday *time.Time
 	if req.Birthday != "" {
@@ -291,8 +291,8 @@ func (s *authService) UpdateProfile(ctx context.Context, req *models.UpdateProfi
 }
 
 // isValidIdentifierScheme checks if identifier scheme is supported
-func (s *authService) isValidIdentifierScheme(scheme string) bool {
-	for _, supportedScheme := range s.config.SupportedIdentifierSchemes {
+func (s *AuthService) isValidIdentifierScheme(scheme string) bool {
+	for _, supportedScheme := range s.config.Schemes.IdentifierSchemes {
 		if scheme == supportedScheme {
 			return true
 		}
@@ -301,8 +301,8 @@ func (s *authService) isValidIdentifierScheme(scheme string) bool {
 }
 
 // isValidCredentialScheme checks if credential scheme is supported
-func (s *authService) isValidCredentialScheme(scheme string) bool {
-	for _, supportedScheme := range s.config.SupportedCredentialSchemes {
+func (s *AuthService) isValidCredentialScheme(scheme string) bool {
+	for _, supportedScheme := range s.config.Schemes.CredentialSchemes {
 		if scheme == supportedScheme {
 			return true
 		}

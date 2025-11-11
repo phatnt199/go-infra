@@ -1,13 +1,13 @@
 {
   "appOptions": {
-    "serviceName": "auth2-service",
+    "serviceName": "authentication-service",
     "deliveryType": "http"
   },
   "fiberHttpOptions": {
-    "port": ":8081",
-    "host": "localhost",
+    "host": "0.0.0.0",
+    "port": ":8080",
     "basePath": "/api/v1",
-    "name": "Auth Service",
+    "name": "Authentication Service",
     "development": true,
     "timeout": 30
   },
@@ -17,9 +17,9 @@
     "port": 54100,
     "user": "admin",
     "password": "123456",
-    "dbName": "go-infra-example-auth",
+    "dbName": "auth_db",
     "sslmode": false,
-    "enable_tracing": false
+    "enableTracing": false
   },
   "logOptions": {
     "level": "info",
@@ -32,14 +32,19 @@
     "port": 54100,
     "user": "admin",
     "password": "123456",
-    "dbName": "go-infra-example-auth",
+    "dbName": "auth_db",
     "sslMode": false,
-    "migrationsDir": "db/migrations/goose-migrate",
+    "migrationsDir": "db/migrations",
     "skipMigration": false
   },
-  "jwtOptions": {
-    "secret": "your-secret-key",
-    "accessTokenExpiration": 3600,
-    "refreshTokenExpiration": 86400
+  "authOptions": {
+    "jwt": {
+      "secret": "your-secret-key-change-in-production",
+      "issuer": "authentication-service",
+      "audience": "authentication-api",
+      "algorithm": "HS256",
+      "accessExpiry": "15m",
+      "refreshExpiry": "168h"
+    }
   }
 }

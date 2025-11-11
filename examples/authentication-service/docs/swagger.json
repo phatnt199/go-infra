@@ -1,0 +1,691 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Authentication service using identifier/credential pattern",
+        "title": "Authentication Service API",
+        "termsOfService": "http://swagger.io/terms/",
+        "contact": {
+            "name": "API Support",
+            "url": "http://www.swagger.io/support",
+            "email": "support@swagger.io"
+        },
+        "license": {
+            "name": "MIT",
+            "url": "https://opensource.org/licenses/MIT"
+        },
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/api/v1",
+    "paths": {
+        "/api/v1/admin/dashboard": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Endpoint accessible only to admin users (requires authentication with admin role)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Admin only endpoint",
+                "responses": {
+                    "200": {
+                        "description": "Admin data",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/models.MessageResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Admin role required",
+                        "schema": {
+                            "$ref": "#/definitions/models.MessageResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/change-password": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Change password using old/new credential pattern (requires authentication)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Change user password",
+                "parameters": [
+                    {
+                        "description": "Change password request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ChangePasswordRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/models.MessageResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/models.MessageResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/models.MessageResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/profile": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get authenticated user profile information (requires authentication)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Get user profile",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/models.UserResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/models.MessageResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "schema": {
+                            "$ref": "#/definitions/models.MessageResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Update authenticated user profile information (requires authentication)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Update user profile",
+                "parameters": [
+                    {
+                        "description": "Update profile request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.UpdateProfileRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/models.UserResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/models.MessageResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/models.MessageResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/signin": {
+            "post": {
+                "description": "Authenticate with identifier/credential pattern",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Sign in user",
+                "parameters": [
+                    {
+                        "description": "Sign in request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.SignInRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/models.AuthResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/models.MessageResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid credentials",
+                        "schema": {
+                            "$ref": "#/definitions/models.MessageResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/signup": {
+            "post": {
+                "description": "Register new user with identifier/credential pattern",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Sign up new user",
+                "parameters": [
+                    {
+                        "description": "Sign up request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.SignUpRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/models.AuthResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/models.MessageResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "User already exists",
+                        "schema": {
+                            "$ref": "#/definitions/models.MessageResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/protected/dashboard": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get dashboard data for authenticated user (requires authentication)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "protected"
+                ],
+                "summary": "Get user dashboard",
+                "responses": {
+                    "200": {
+                        "description": "Dashboard data",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/models.MessageResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/protected/settings": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get settings for authenticated user (requires authentication)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "protected"
+                ],
+                "summary": "Get user settings",
+                "responses": {
+                    "200": {
+                        "description": "User settings",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/models.MessageResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Update settings for authenticated user (requires authentication)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "protected"
+                ],
+                "summary": "Update user settings",
+                "parameters": [
+                    {
+                        "description": "Settings to update",
+                        "name": "settings",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Settings updated",
+                        "schema": {
+                            "$ref": "#/definitions/models.MessageResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/models.MessageResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/models.MessageResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "github_com_phatnt199_go-infra_pkg_component_authentication_models.Credential": {
+            "type": "object",
+            "required": [
+                "scheme",
+                "value"
+            ],
+            "properties": {
+                "scheme": {
+                    "type": "string",
+                    "example": "basic"
+                },
+                "value": {
+                    "type": "string",
+                    "example": "pass123"
+                }
+            }
+        },
+        "github_com_phatnt199_go-infra_pkg_component_authentication_models.Identifier": {
+            "type": "object",
+            "required": [
+                "scheme",
+                "value"
+            ],
+            "properties": {
+                "scheme": {
+                    "type": "string",
+                    "example": "username"
+                },
+                "value": {
+                    "type": "string",
+                    "example": "john"
+                }
+            }
+        },
+        "github_com_phatnt199_go-infra_pkg_component_authentication_models.TokenInfo": {
+            "type": "object",
+            "properties": {
+                "expiresAt": {
+                    "type": "string",
+                    "example": "2024-12-31T23:59:59Z"
+                },
+                "scheme": {
+                    "type": "string",
+                    "example": "bearer"
+                },
+                "type": {
+                    "type": "string",
+                    "example": "access"
+                },
+                "value": {
+                    "type": "string",
+                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                }
+            }
+        },
+        "models.AuthResponse": {
+            "description": "Authentication response with user info and tokens",
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string",
+                    "example": "2024-01-01T00:00:00Z"
+                },
+                "email": {
+                    "type": "string",
+                    "example": "john@example.com"
+                },
+                "firstname": {
+                    "type": "string",
+                    "example": "John"
+                },
+                "lastname": {
+                    "type": "string",
+                    "example": "Doe"
+                },
+                "refreshToken": {
+                    "$ref": "#/definitions/github_com_phatnt199_go-infra_pkg_component_authentication_models.TokenInfo"
+                },
+                "status": {
+                    "type": "string",
+                    "example": "active"
+                },
+                "token": {
+                    "$ref": "#/definitions/github_com_phatnt199_go-infra_pkg_component_authentication_models.TokenInfo"
+                },
+                "userId": {
+                    "type": "string",
+                    "example": "123e4567-e89b-12d3-a456-426614174000"
+                },
+                "userType": {
+                    "type": "string",
+                    "example": "user"
+                },
+                "username": {
+                    "type": "string",
+                    "example": "john"
+                }
+            }
+        },
+        "models.ChangePasswordRequest": {
+            "description": "Change password using credential pattern",
+            "type": "object",
+            "required": [
+                "newCredential",
+                "oldCredential"
+            ],
+            "properties": {
+                "clientId": {
+                    "type": "string",
+                    "example": "web-app"
+                },
+                "newCredential": {
+                    "$ref": "#/definitions/github_com_phatnt199_go-infra_pkg_component_authentication_models.Credential"
+                },
+                "oldCredential": {
+                    "$ref": "#/definitions/github_com_phatnt199_go-infra_pkg_component_authentication_models.Credential"
+                }
+            }
+        },
+        "models.MessageResponse": {
+            "description": "Standard message response",
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "Operation completed successfully"
+                },
+                "success": {
+                    "type": "boolean",
+                    "example": true
+                }
+            }
+        },
+        "models.SignInRequest": {
+            "description": "Authentication request using identifier/credential pattern Schemes must be explicitly specified",
+            "type": "object",
+            "required": [
+                "credential",
+                "identifier"
+            ],
+            "properties": {
+                "clientId": {
+                    "type": "string",
+                    "example": "web-app"
+                },
+                "credential": {
+                    "$ref": "#/definitions/github_com_phatnt199_go-infra_pkg_component_authentication_models.Credential"
+                },
+                "identifier": {
+                    "$ref": "#/definitions/github_com_phatnt199_go-infra_pkg_component_authentication_models.Identifier"
+                }
+            }
+        },
+        "models.SignUpRequest": {
+            "description": "User registration using identifier/credential pattern",
+            "type": "object",
+            "required": [
+                "credential",
+                "identifier"
+            ],
+            "properties": {
+                "birthday": {
+                    "type": "string",
+                    "example": "1990-01-01"
+                },
+                "clientId": {
+                    "type": "string",
+                    "example": "web-app"
+                },
+                "credential": {
+                    "$ref": "#/definitions/github_com_phatnt199_go-infra_pkg_component_authentication_models.Credential"
+                },
+                "email": {
+                    "type": "string",
+                    "example": "john@example.com"
+                },
+                "firstname": {
+                    "description": "Profile fields",
+                    "type": "string",
+                    "maxLength": 100,
+                    "example": "John"
+                },
+                "identifier": {
+                    "$ref": "#/definitions/github_com_phatnt199_go-infra_pkg_component_authentication_models.Identifier"
+                },
+                "lastname": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "example": "Doe"
+                },
+                "locale": {
+                    "type": "string",
+                    "example": "en_US"
+                }
+            }
+        },
+        "models.UpdateProfileRequest": {
+            "description": "Update user profile information",
+            "type": "object",
+            "properties": {
+                "birthday": {
+                    "type": "string",
+                    "example": "1990-01-01"
+                },
+                "email": {
+                    "type": "string",
+                    "example": "john@example.com"
+                },
+                "firstname": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "example": "John"
+                },
+                "lastname": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "example": "Doe"
+                },
+                "locale": {
+                    "type": "string",
+                    "example": "en_US"
+                },
+                "metadata": {
+                    "type": "object",
+                    "additionalProperties": true
+                }
+            }
+        },
+        "models.UserResponse": {
+            "description": "User profile information",
+            "type": "object",
+            "properties": {
+                "birthday": {
+                    "type": "string",
+                    "example": "1990-01-01T00:00:00Z"
+                },
+                "createdAt": {
+                    "type": "string",
+                    "example": "2024-01-01T00:00:00Z"
+                },
+                "email": {
+                    "type": "string",
+                    "example": "john@example.com"
+                },
+                "firstname": {
+                    "type": "string",
+                    "example": "John"
+                },
+                "lastname": {
+                    "type": "string",
+                    "example": "Doe"
+                },
+                "locale": {
+                    "type": "string",
+                    "example": "en_US"
+                },
+                "metadata": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "status": {
+                    "type": "string",
+                    "example": "active"
+                },
+                "userId": {
+                    "type": "string",
+                    "example": "123e4567-e89b-12d3-a456-426614174000"
+                },
+                "userType": {
+                    "type": "string",
+                    "example": "user"
+                },
+                "username": {
+                    "type": "string",
+                    "example": "john"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "description": "Type \"Bearer\" followed by a space and JWT token.",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    }
+}

@@ -7,7 +7,6 @@ import (
 	"github.com/phatnt199/go-infra/examples/authentication-service/internal/shared/data/dbcontext"
 	authComponent "github.com/phatnt199/go-infra/pkg/component/authentication"
 	authContracts "github.com/phatnt199/go-infra/pkg/component/authentication/contracts"
-	defaultModels "github.com/phatnt199/go-infra/pkg/component/authentication/implementations/default/models"
 	"github.com/phatnt199/go-infra/pkg/crypto"
 	"github.com/phatnt199/go-infra/pkg/logger"
 	"go.uber.org/fx"
@@ -48,16 +47,22 @@ func provideMicroserviceAuth(opts ProvideMicroserviceAuthOptions) (ProvideMicros
 	// Get GORM DB from context
 	db := opts.DBContext.DB()
 
-	// Auto-migrate default models
-	err := db.AutoMigrate(
-		&defaultModels.User{},
-		&defaultModels.UserIdentifier{},
-		&defaultModels.UserCredential{},
-		&defaultModels.UserProfile{},
-	)
-	if err != nil {
-		opts.Logger.Warnf("Failed to auto-migrate auth tables: %v", err)
-	}
+	// NOTE: Auto-migration is disabled in favor of SQL migrations (Goose)
+	// The authentication tables are managed through migration files in db/migrations/goose-migrate/
+	// This prevents conflicts between AutoMigrate and Goose migrations
+	// If you need to use AutoMigrate instead:
+	// 1. Comment out the SQL migration file: 004_create_microservice_auth_tables.sql
+	// 2. Uncomment the following AutoMigrate code:
+	//
+	// err := db.AutoMigrate(
+	// 	&defaultModels.User{},
+	// 	&defaultModels.UserIdentifier{},
+	// 	&defaultModels.UserCredential{},
+	// 	&defaultModels.UserProfile{},
+	// )
+	// if err != nil {
+	// 	opts.Logger.Warnf("Failed to auto-migrate auth tables: %v", err)
+	// }
 
 	// Create authentication component with default implementation
 	// This provides a complete ready-to-use auth system following microservice pattern

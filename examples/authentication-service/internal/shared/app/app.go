@@ -1,16 +1,19 @@
 package app
 
 import (
+	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"github.com/phatnt199/go-infra/examples/authentication-service/config"
 	"github.com/phatnt199/go-infra/examples/authentication-service/docs"
 	microserviceauth "github.com/phatnt199/go-infra/examples/authentication-service/internal/microservice-auth"
 	"github.com/phatnt199/go-infra/examples/authentication-service/internal/shared/data"
+	"github.com/phatnt199/go-infra/examples/authentication-service/internal/shared/handlers"
 	"github.com/phatnt199/go-infra/pkg/adapter/fxapp"
 	"github.com/phatnt199/go-infra/pkg/adapter/fxapp/contracts"
 	httpContracts "github.com/phatnt199/go-infra/pkg/adapter/http/contracts"
 	fiberAdapter "github.com/phatnt199/go-infra/pkg/adapter/http/fiber_adapter"
 	authComponent "github.com/phatnt199/go-infra/pkg/component/authentication"
+	authContracts "github.com/phatnt199/go-infra/pkg/component/authentication/contracts"
 	"github.com/phatnt199/go-infra/pkg/health"
 	postgresgorm "github.com/phatnt199/go-infra/pkg/infra/postgres/gorm"
 	"github.com/phatnt199/go-infra/pkg/logger"
@@ -47,6 +50,7 @@ func NewApplication() *Application {
 
 	// Include auth module
 	// builder.ProvideModule(auth.Module)
+	// builder.ProvideModule(customauth.Module)
 	builder.ProvideModule(microserviceauth.Module)
 
 	// Build the application
@@ -80,35 +84,67 @@ func NewApplication() *Application {
 	app.RegisterHook(registerSwagger)
 
 	// Register authentication endpoints as a hook
-	registerAuthentication := func(authComp *authComponent.Component, server httpContracts.HttpServer, log logger.Logger) {
+	registerAuthentication := func(
+		authComp *authComponent.Component,
+		authService authContracts.IAuthService,
+		server httpContracts.HttpServer,
+		log logger.Logger,
+	) {
 		// Create the auth route group with the basePath
 		basePath := server.Cfg().GetBasePath()
 		v1Group := server.RouteBuilder().Group(basePath)
-		authGroup := v1Group.Group("/auth")
-
-		// Create handler factory from component
-		handlerFactory := authComp.GetHandlerFactory()
 
 		// Get JWT middleware from component for protected routes
 		jwtMiddleware := authComp.GetJWTMiddleware()
 
-		// Register authentication endpoints using handler factory
-		// Sign Up: POST /auth/signup (public)
-		authGroup.POST("/signup", handlerFactory.SignUp())
+		// Create local handlers with swagger annotations
+		authHandlers := handlers.NewAuthHandlers(authService, validator.New(), log)
+		protectedHandlers := handlers.NewProtectedHandlers(log)
 
-		// Sign In: POST /auth/signin (public)
-		authGroup.POST("/signin", handlerFactory.SignIn())
+		// ============ PUBLIC AUTH ENDPOINTS ============
+		authGroup := v1Group.Group("/auth")
 
-		// Change Password: PUT /auth/change-password (requires authentication)
-		authGroup.PUT("/change-password", handlerFactory.ChangePassword(), jwtMiddleware.Handle())
+		// Sign Up: POST /api/v1/auth/signup (public)
+		authGroup.POST("/signup", authHandlers.SignUp)
 
-		// Get Profile: GET /auth/profile (requires authentication)
-		authGroup.GET("/profile", handlerFactory.GetProfile(), jwtMiddleware.Handle())
+		// Sign In: POST /api/v1/auth/signin (public)
+		authGroup.POST("/signin", authHandlers.SignIn)
 
-		// Update Profile: PUT /auth/profile (requires authentication)
-		authGroup.PUT("/profile", handlerFactory.UpdateProfile(), jwtMiddleware.Handle())
+		// ============ PROTECTED AUTH ENDPOINTS ============
+		// These require authentication via JWT token
 
-		log.Info("Authentication endpoints registered successfully")
+		// Change Password: PUT /api/v1/auth/change-password (authenticated)
+		authGroup.PUT("/change-password", authHandlers.ChangePassword, jwtMiddleware.Handle())
+
+		// Get Profile: GET /api/v1/auth/profile (authenticated)
+		authGroup.GET("/profile", authHandlers.GetProfile, jwtMiddleware.Handle())
+
+		// Update Profile: PUT /api/v1/auth/profile (authenticated)
+		authGroup.PUT("/profile", authHandlers.UpdateProfile, jwtMiddleware.Handle())
+
+		// ============ PROTECTED FEATURE ENDPOINTS ============
+		// Example endpoints demonstrating authentication usage
+		protectedGroup := v1Group.Group("/protected", jwtMiddleware.Handle())
+
+		// Dashboard: GET /api/v1/protected/dashboard (authenticated)
+		protectedGroup.GET("/dashboard", protectedHandlers.GetUserDashboard)
+
+		// Settings: GET /api/v1/protected/settings (authenticated)
+		protectedGroup.GET("/settings", protectedHandlers.GetUserSettings)
+
+		// Update Settings: PUT /api/v1/protected/settings (authenticated)
+		protectedGroup.PUT("/settings", protectedHandlers.UpdateUserSettings)
+
+		// ============ ADMIN ENDPOINTS ============
+		// Example endpoints requiring admin role
+		adminGroup := v1Group.Group("/admin", jwtMiddleware.Handle())
+
+		// Admin Dashboard: GET /api/v1/admin/dashboard (authenticated + admin role)
+		adminGroup.GET("/dashboard", protectedHandlers.AdminOnlyEndpoint)
+
+		log.Info("Authentication and protected endpoints registered successfully")
+		log.Info("Public endpoints: /api/v1/auth/signup, /api/v1/auth/signin")
+		log.Info("Protected endpoints: /api/v1/auth/*, /api/v1/protected/*, /api/v1/admin/*")
 	}
 	app.RegisterHook(registerAuthentication)
 

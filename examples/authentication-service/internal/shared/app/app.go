@@ -4,7 +4,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/phatnt199/go-infra/examples/authentication-service/config"
 	"github.com/phatnt199/go-infra/examples/authentication-service/docs"
-	"github.com/phatnt199/go-infra/examples/authentication-service/internal/auth"
+	microserviceauth "github.com/phatnt199/go-infra/examples/authentication-service/internal/microservice-auth"
 	"github.com/phatnt199/go-infra/examples/authentication-service/internal/shared/data"
 	"github.com/phatnt199/go-infra/pkg/adapter/fxapp"
 	"github.com/phatnt199/go-infra/pkg/adapter/fxapp/contracts"
@@ -46,7 +46,8 @@ func NewApplication() *Application {
 	builder.ProvideModule(health.Module)
 
 	// Include auth module
-	builder.ProvideModule(auth.Module)
+	// builder.ProvideModule(auth.Module)
+	builder.ProvideModule(microserviceauth.Module)
 
 	// Build the application
 	app := builder.Build()

@@ -10,9 +10,9 @@ import (
 // BaseEntity contains common fields for all entities
 type BaseEntity struct {
 	ID         uuid.UUID      `gorm:"column:id;type:uuid;primaryKey;default:gen_random_uuid()" json:"id"`
-	CreatedAt  time.Time      `gorm:"column:created_at;type:timestamp;default:CURRENT_TIMESTAMP" json:"createdAt"`
-	ModifiedAt time.Time      `gorm:"column:modified_at;type:timestamp;default:CURRENT_TIMESTAMP" json:"modifiedAt"`
-	DeletedAt  gorm.DeletedAt `gorm:"column:deleted_at;index" json:"deletedAt,omitempty"`
+	CreatedAt  time.Time      `gorm:"column:created_at;type:timestamptz;default:CURRENT_TIMESTAMP" json:"createdAt"`
+	ModifiedAt time.Time      `gorm:"column:modified_at;type:timestamptz;default:CURRENT_TIMESTAMP" json:"modifiedAt"`
+	DeletedAt  gorm.DeletedAt `gorm:"column:deleted_at;index;type:timestamptz" json:"deletedAt,omitempty"`
 }
 
 // BeforeCreate sets the ID before creating a new record

@@ -125,16 +125,16 @@ func (u UserStatusEnum) String() string {
 // UserDataModel represents the users table
 type UserDataModel struct {
 	ID          uuid.UUID      `gorm:"column:id;type:uuid;primaryKey;default:gen_random_uuid()"`
-	CreatedAt   time.Time      `gorm:"column:created_at;type:timestamp;default:CURRENT_TIMESTAMP"`
-	ModifiedAt  time.Time      `gorm:"column:modified_at;type:timestamp;default:CURRENT_TIMESTAMP"`
-	DeletedAt   gorm.DeletedAt `gorm:"column:deleted_at;index"`
+	CreatedAt   time.Time      `gorm:"column:created_at;type:timestamptz;default:CURRENT_TIMESTAMP"`
+	ModifiedAt  time.Time      `gorm:"column:modified_at;type:timestamptz;default:CURRENT_TIMESTAMP"`
+	DeletedAt   gorm.DeletedAt `gorm:"column:deleted_at;index;type:timestamptz"`
 	Status      UserStatusEnum `gorm:"column:status;type:varchar(20);not null;default:'100_ACTIVATE'"`
 	UserType    UserTypeEnum   `gorm:"column:user_type;type:varchar(10);not null;default:'SYSTEM'"`
-	ActivatedAt *time.Time     `gorm:"column:activated_at;type:timestamp"`
-	LastLoginAt *time.Time     `gorm:"column:last_login_at;type:timestamp"`
+	ActivatedAt *time.Time     `gorm:"column:activated_at;type:timestamptz"`
+	LastLoginAt *time.Time     `gorm:"column:last_login_at;type:timestamptz"`
 	ParentID    *uuid.UUID     `gorm:"column:parent_id;type:uuid"`
-	ValidFrom   *time.Time     `gorm:"column:valid_from;type:timestamp"`
-	ValidTo     *time.Time     `gorm:"column:valid_to;type:timestamp"`
+	ValidFrom   *time.Time     `gorm:"column:valid_from;type:timestamptz"`
+	ValidTo     *time.Time     `gorm:"column:valid_to;type:timestamptz"`
 }
 
 func (u *UserDataModel) TableName() string {
@@ -145,9 +145,9 @@ func (u *UserDataModel) TableName() string {
 type UserIdentifierDataModel struct {
 	ID         uuid.UUID      `gorm:"column:id;type:uuid;primaryKey;default:gen_random_uuid()"`
 	UserID     uuid.UUID      `gorm:"column:user_id;type:uuid;not null"`
-	CreatedAt  time.Time      `gorm:"column:created_at;type:timestamp;default:CURRENT_TIMESTAMP"`
-	ModifiedAt time.Time      `gorm:"column:modified_at;type:timestamp;default:CURRENT_TIMESTAMP"`
-	DeletedAt  gorm.DeletedAt `gorm:"column:deleted_at;index"`
+	CreatedAt  time.Time      `gorm:"column:created_at;type:timestamptz;default:CURRENT_TIMESTAMP"`
+	ModifiedAt time.Time      `gorm:"column:modified_at;type:timestamptz;default:CURRENT_TIMESTAMP"`
+	DeletedAt  gorm.DeletedAt `gorm:"column:deleted_at;index;type:timestamptz"`
 	Scheme     string         `gorm:"column:scheme;type:varchar(50);not null;default:'username'"`
 	Identifier string         `gorm:"column:identifier;type:varchar(255);not null"`
 	Verified   bool           `gorm:"column:verified;type:boolean;not null;default:true"`
@@ -162,9 +162,9 @@ func (u *UserIdentifierDataModel) TableName() string {
 type UserCredentialDataModel struct {
 	ID         uuid.UUID      `gorm:"column:id;type:uuid;primaryKey;default:gen_random_uuid()"`
 	UserID     uuid.UUID      `gorm:"column:user_id;type:uuid;not null"`
-	CreatedAt  time.Time      `gorm:"column:created_at;type:timestamp;default:CURRENT_TIMESTAMP"`
-	ModifiedAt time.Time      `gorm:"column:modified_at;type:timestamp;default:CURRENT_TIMESTAMP"`
-	DeletedAt  gorm.DeletedAt `gorm:"column:deleted_at;index"`
+	CreatedAt  time.Time      `gorm:"column:created_at;type:timestamptz;default:CURRENT_TIMESTAMP"`
+	ModifiedAt time.Time      `gorm:"column:modified_at;type:timestamptz;default:CURRENT_TIMESTAMP"`
+	DeletedAt  gorm.DeletedAt `gorm:"column:deleted_at;index;type:timestamptz"`
 	Scheme     string         `gorm:"column:scheme;type:varchar(50);not null;default:'basic'"`
 	Credential string         `gorm:"column:credential;type:varchar(255);not null"`
 	Details    JSONB          `gorm:"column:details;type:jsonb;default:'{}'"`
@@ -178,9 +178,9 @@ func (u *UserCredentialDataModel) TableName() string {
 type UserProfileDataModel struct {
 	ID         uuid.UUID      `gorm:"column:id;type:uuid;primaryKey;default:gen_random_uuid()"`
 	UserID     uuid.UUID      `gorm:"column:user_id;type:uuid;not null"`
-	CreatedAt  time.Time      `gorm:"column:created_at;type:timestamp;default:CURRENT_TIMESTAMP"`
-	ModifiedAt time.Time      `gorm:"column:modified_at;type:timestamp;default:CURRENT_TIMESTAMP"`
-	DeletedAt  gorm.DeletedAt `gorm:"column:deleted_at;index"`
+	CreatedAt  time.Time      `gorm:"column:created_at;type:timestamptz;default:CURRENT_TIMESTAMP"`
+	ModifiedAt time.Time      `gorm:"column:modified_at;type:timestamptz;default:CURRENT_TIMESTAMP"`
+	DeletedAt  gorm.DeletedAt `gorm:"column:deleted_at;index;type:timestamptz"`
 	Firstname  string         `gorm:"column:firstname;type:varchar(255)"`
 	Lastname   string         `gorm:"column:lastname;type:varchar(255)"`
 	Birthday   *time.Time     `gorm:"column:birthday;type:date"`

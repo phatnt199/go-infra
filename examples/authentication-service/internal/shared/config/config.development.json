@@ -4,7 +4,7 @@
     "deliveryType": "http"
   },
   "fiberHttpOptions": {
-    "port": ":8081",
+    "port": ":8080",
     "host": "localhost",
     "basePath": "/api/v1",
     "name": "Auth Service",

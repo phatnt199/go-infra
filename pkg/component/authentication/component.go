@@ -5,11 +5,14 @@ import (
 	"github.com/phatnt199/go-infra/pkg/component/authentication/config"
 	"github.com/phatnt199/go-infra/pkg/component/authentication/contracts"
 	"github.com/phatnt199/go-infra/pkg/component/authentication/handlers"
+	defaultimpl "github.com/phatnt199/go-infra/pkg/component/authentication/implementations/default"
 	"github.com/phatnt199/go-infra/pkg/component/authentication/middleware"
 	"github.com/phatnt199/go-infra/pkg/component/authentication/services"
 	"github.com/phatnt199/go-infra/pkg/component/authentication/strategies"
+	"github.com/phatnt199/go-infra/pkg/crypto"
 	"github.com/phatnt199/go-infra/pkg/logger"
 	"github.com/phatnt199/go-infra/pkg/logger/empty"
+	"gorm.io/gorm"
 )
 
 // Component represents the authentication component in framework mode
@@ -83,6 +86,61 @@ func NewComponentWithConfig(userProvider contracts.IUserProvider, cfg *config.Co
 	component.initializeDefaults()
 
 	return component
+}
+
+// NewComponentWithDefaultImplementation creates a component with default microservice-style implementation
+// This provides a ready-to-use authentication system with User/Identifier/Credential/Profile separation
+// Users only need to provide a GORM database connection and JWT configuration
+func NewComponentWithDefaultImplementation(db *gorm.DB, jwtConfig *crypto.JWTConfig, opts ...Option) (*Component, error) {
+	// Create config from JWT config
+	cfg := &config.Config{
+		JWT: config.JWTConfig{
+			Secret:        jwtConfig.Secret,
+			Issuer:        jwtConfig.Issuer,
+			Audience:      jwtConfig.Audience,
+			Algorithm:     string(jwtConfig.Algorithm),
+			AccessExpiry:  jwtConfig.AccessTokenExpiry,
+			RefreshExpiry: jwtConfig.RefreshTokenExpiry,
+		},
+		Password: config.PasswordConfig{
+			HashAlgorithm:  "bcrypt",
+			BcryptCost:     12,
+			MinLength:      8,
+			RequireUpper:   false,
+			RequireLower:   false,
+			RequireNumber:  false,
+			RequireSpecial: false,
+		},
+		Schemes: config.SchemesConfig{
+			IdentifierSchemes: []string{"username", "email", "phone"},
+			CredentialSchemes: []string{"basic"},
+		},
+	}
+
+	component := &Component{
+		config:    cfg,
+		logger:    empty.EmptyLogger,
+		validator: validator.New(),
+	}
+
+	// Apply options first (allows overriding logger, etc.)
+	for _, opt := range opts {
+		opt(component)
+	}
+
+	// Create default implementation
+	authService, err := defaultimpl.NewDefaultImplementation(db, jwtConfig, component.logger)
+	if err != nil {
+		return nil, err
+	}
+
+	// Set the auth service
+	component.authService = authService
+
+	// Initialize infrastructure (middleware, strategies, etc.)
+	component.initializeDefaults()
+
+	return component, nil
 }
 
 // initializeDefaults initializes default implementations if not provided

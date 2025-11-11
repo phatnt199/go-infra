@@ -8,14 +8,14 @@ CREATE TABLE users (
     password VARCHAR(255) NOT NULL,
     firstname VARCHAR(100),
     lastname VARCHAR(100),
-    birthday TIMESTAMP,
+    birthday DATE,
     locale VARCHAR(10) DEFAULT 'en_US',
     status VARCHAR(20) DEFAULT 'active',
     user_type VARCHAR(20) DEFAULT 'user',
     metadata JSONB,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    deleted_at TIMESTAMP
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    deleted_at TIMESTAMPTZ
 );
 
 CREATE INDEX idx_users_username ON users (username);

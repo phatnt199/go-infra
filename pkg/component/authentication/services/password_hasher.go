@@ -1,8 +1,7 @@
 package services
 
 import (
-	"fmt"
-
+	"github.com/phatnt199/go-infra/pkg/crypto"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -12,38 +11,47 @@ type IPasswordHasher interface {
 	ComparePassword(password, hash string) (bool, error)
 }
 
-// BcryptHasher implements IPasswordHasher using bcrypt
+// BcryptHasher implements IPasswordHasher using pkg/crypto.Hasher
+// This is a thin wrapper that provides backward compatibility while
+// leveraging the more comprehensive crypto package implementation.
 type BcryptHasher struct {
-	cost int
+	hasher    *crypto.Hasher
+	algorithm crypto.HashAlgorithm
 }
 
 // NewBcryptHasher creates a new bcrypt hasher
+// The cost parameter is used to configure bcrypt hashing strength.
 func NewBcryptHasher(cost int) *BcryptHasher {
 	if cost == 0 {
 		cost = bcrypt.DefaultCost
 	}
+
+	config := &crypto.HashConfig{
+		BcryptCost: cost,
+	}
+
 	return &BcryptHasher{
-		cost: cost,
+		hasher:    crypto.NewHasher(config),
+		algorithm: crypto.AlgorithmBcrypt,
 	}
 }
 
-// HashPassword hashes a password using bcrypt
-func (h *BcryptHasher) HashPassword(password string) (string, error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(password), h.cost)
-	if err != nil {
-		return "", fmt.Errorf("failed to hash password: %w", err)
+// NewArgon2Hasher creates a new Argon2 hasher
+// This provides a more secure alternative to bcrypt for new implementations.
+func NewArgon2Hasher() *BcryptHasher {
+	return &BcryptHasher{
+		hasher:    crypto.NewHasher(crypto.DefaultHashConfig()),
+		algorithm: crypto.AlgorithmArgon2,
 	}
-	return string(bytes), nil
+}
+
+// HashPassword hashes a password using the configured algorithm
+func (h *BcryptHasher) HashPassword(password string) (string, error) {
+	return h.hasher.HashPassword(password, h.algorithm)
 }
 
 // ComparePassword compares a password with a hash
+// This automatically detects the algorithm used in the hash
 func (h *BcryptHasher) ComparePassword(password, hash string) (bool, error) {
-	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
-	if err != nil {
-		if err == bcrypt.ErrMismatchedHashAndPassword {
-			return false, nil
-		}
-		return false, fmt.Errorf("failed to compare password: %w", err)
-	}
-	return true, nil
+	return h.hasher.ComparePassword(password, hash)
 }

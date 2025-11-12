@@ -53,3 +53,10 @@ local.env
 # Misc
 *.prof
 .coverage
+
+# Docusaurus / docs-site generated directories
+# Keep generated site artifacts out of the repo working tree on other branches
+/docs-site/.docusaurus/
+/docs-site/node_modules/
+/docs-site/build/
+/docs-site/.cache-loader/

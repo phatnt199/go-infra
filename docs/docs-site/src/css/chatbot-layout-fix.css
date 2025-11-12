@@ -1,0 +1,34 @@
+/* Override Docusaurus layout to work with fixed chatbot */
+
+/* Ensure sidebar and TOC can scroll independently from chat */
+.docSidebar,
+.tableOfContents {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+/* Fix the main layout container */
+.docusaurus-mt-lg {
+  display: flex;
+  flex-direction: row;
+}
+
+/* Ensure the navbar doesn't conflict with fixed elements */
+[role="navigation"] {
+  position: relative;
+  z-index: 100;
+}
+
+/* Ensure main content respects the layout */
+main {
+  flex: 1;
+  overflow: visible;
+}
+
+/* For the article/blog content */
+article {
+  flex: 1;
+  overflow: visible;
+}

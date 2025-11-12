@@ -1,0 +1,26 @@
+.markdownContent {
+  width: 100%;
+  word-break: break-word;
+  line-height: 1.6;
+}
+
+.markdownContent p {
+  margin: 0;
+  line-height: 1.6;
+}
+
+.inlineCode {
+  background: var(--ifm-color-emphasis-100);
+  color: var(--ifm-color-primary);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: "Courier New", monospace;
+  font-size: 0.9em;
+  word-break: break-all;
+}
+
+/* Dark mode adjustments */
+[data-theme="dark"] .inlineCode {
+  background: var(--ifm-background-surface-color);
+  color: var(--ifm-code-color);
+}

@@ -219,9 +219,9 @@ export default function DocsChatbot({
 									<MarkdownRenderer content={message.content} />
 								)}
 							</div>
-							{message.role === "assistant" && (
+							{/* {message.role === "assistant" && (
 								<SourceHandler sources={message.sources} />
-							)}
+							)} */}
 						</div>
 					))}
 					{isLoading && (

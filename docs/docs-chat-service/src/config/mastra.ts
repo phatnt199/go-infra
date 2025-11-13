@@ -1,6 +1,6 @@
 import * as dotenv from "dotenv";
 import { google } from "@ai-sdk/google";
-import { Mastra } from "@mastra/core";
+import { Mastra } from "@mastra/core//mastra";
 import { LibSQLVector } from "@mastra/libsql";
 import { embed } from "ai";
 

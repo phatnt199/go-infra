@@ -4,7 +4,7 @@ import DocsChatbot from "../components/DocsChatbot";
 import styles from "./Root.module.css";
 
 export default function RootWrapper(props) {
-	const [isChatOpen, setIsChatOpen] = useState(true);
+	const [isChatOpen, setIsChatOpen] = useState(false);
 
 	return (
 		<div

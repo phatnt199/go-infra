@@ -29,6 +29,29 @@ const sidebars: SidebarsConfig = {
 				"core-concepts/modules",
 				"core-concepts/dependency-injection",
 				"core-concepts/configuration",
+				"core-concepts/utilities",
+			],
+		},
+		{
+			type: "category",
+			label: "Core Runtime",
+			items: [
+				"core-runtime/runtime-overview",
+				"core-runtime/events",
+				"core-runtime/cqrs",
+				"core-runtime/messaging",
+				"core-runtime/metadata",
+				"core-runtime/serialization",
+			],
+		},
+		{
+			type: "category",
+			label: "Event Sourcing",
+			items: [
+				"event-sourcing/overview",
+				"event-sourcing/configuration",
+				"event-sourcing/projections",
+				"event-sourcing/testing",
 			],
 		},
 		{
@@ -49,7 +72,60 @@ const sidebars: SidebarsConfig = {
 		{
 			type: "category",
 			label: "Components",
-			items: ["components/logger", "components/crypto"],
+			items: [
+				"components/logger",
+				"components/crypto",
+				"components/health",
+				"components/mapper",
+				"components/validator",
+				"components/reflection",
+				"components/testing",
+				"components/otel",
+			],
+		},
+		{
+			type: "category",
+			label: "Infrastructure",
+			items: [
+				"infra/postgres",
+				"infra/redis",
+				"infra/cache",
+				"infra/queue",
+				"infra/storage",
+			],
+		},
+		{
+			type: "category",
+			label: "Migration",
+			items: ["migration/overview", "migration/goose", "migration/gomigrate"],
+		},
+		{
+			type: "category",
+			label: "Usage Patterns",
+			items: [
+				"usage/direct-vs-fx",
+				"usage/customization",
+				"usage/module-testing",
+				"usage/config-patterns",
+			],
+		},
+		{
+			type: "category",
+			label: "Project Structures",
+			items: [
+				"project-structures/minimal",
+				"project-structures/modular",
+				"project-structures/microservices",
+			],
+		},
+		{
+			type: "category",
+			label: "Reference",
+			items: [
+				"reference/configuration-options",
+				"reference/fx-modules",
+				"reference/public-apis",
+			],
 		},
 		{
 			type: "category",

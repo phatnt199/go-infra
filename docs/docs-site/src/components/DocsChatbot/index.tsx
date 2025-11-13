@@ -2,13 +2,14 @@ import React, { useState, useRef, useEffect } from "react";
 import styles from "./DocsChatbot.module.css";
 import MarkdownRenderer from "./MarkdownRenderer";
 import SourceHandler from "./SourceHandler";
+import { mastraClient } from "../../lib/mastra-client";
 
 interface Message {
 	role: "user" | "assistant";
 	content: string;
 	sources?: Array<{
-		source: string;
 		title: string;
+		url: string;
 		content: string;
 	}>;
 }
@@ -17,11 +18,6 @@ interface DocsChatbotProps {
 	isChatOpen?: boolean;
 	setIsChatOpen?: (state: boolean) => void;
 }
-
-const API_URL =
-	typeof window !== "undefined" && (window as any).REACT_APP_CHAT_API_URL
-		? (window as any).REACT_APP_CHAT_API_URL
-		: "http://localhost:3001";
 
 export default function DocsChatbot({
 	isChatOpen = false,
@@ -64,121 +60,106 @@ export default function DocsChatbot({
 		};
 
 		setMessages((prev) => [...prev, userMessage]);
+		const userInput = input;
 		setInput("");
 		setIsLoading(true);
 
-		const userInput = input; // Capture input before clearing
-		let retries = 0;
-		const maxRetries = 2;
+		// Create a placeholder message for streaming
+		const assistantMessageIndex = messages.length + 1;
+		setMessages((prev) => [
+			...prev,
+			{
+				role: "assistant",
+				content: "",
+			},
+		]);
 
 		try {
-			// Prepare conversation history (last 5 messages)
-			const history = messages.slice(-5).map((msg) => ({
+			// Get the docsAgent from Mastra client
+			const agent = mastraClient.getAgent("docsAgent");
+
+			// Prepare conversation history (last 5 messages for context)
+			const conversationHistory = messages.slice(-5).map((msg) => ({
 				role: msg.role,
 				content: msg.content,
 			}));
 
-			// Retry logic with exponential backoff
-			let lastError: Error | null = null;
-			for (retries = 0; retries <= maxRetries; retries++) {
-				try {
-					// Create abort controller with 45 second timeout
-					const controller = new AbortController();
-					const timeoutId = setTimeout(() => controller.abort(), 45000);
+			// Stream the response
+			const stream = await agent.stream({
+				messages: [
+					...conversationHistory,
+					{ role: "user", content: userInput },
+				],
+			} as any);
 
-					const response = await fetch(`${API_URL}/api/chat`, {
-						method: "POST",
-						headers: {
-							"Content-Type": "application/json",
-						},
-						body: JSON.stringify({
-							message: userInput,
-							history,
-						}),
-						signal: controller.signal,
-					});
+			let fullText = "";
+			let sources: Array<{ title: string; url: string; content: string }> = [];
 
-					clearTimeout(timeoutId);
-
-					if (!response.ok) {
-						throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-					}
-
-					const data = await response.json();
-
-					if (data.success) {
-						// Validate response structure
-						if (!data.answer || data.answer.trim().length === 0) {
-							throw new Error("Empty response received from server");
+			// Process the stream
+			await stream.processDataStream({
+				onChunk: async (chunk: any) => {
+					if (chunk.type === "text-delta") {
+						fullText += chunk.payload.text;
+						// Update the message in real-time
+						setMessages((prev) => {
+							const newMessages = [...prev];
+							newMessages[assistantMessageIndex] = {
+								role: "assistant",
+								content: fullText,
+								sources,
+							};
+							return newMessages;
+						});
+					} else if (chunk.type === "tool-result") {
+						// Extract sources from RAG tool results
+						const toolResult = chunk.payload.result;
+						if (toolResult?.results && Array.isArray(toolResult.results)) {
+							sources = toolResult.results.map((r: any) => ({
+								title: r.title || "Unknown",
+								url: r.url || "#",
+								content: r.content || "",
+							}));
+							// Update message with sources
+							setMessages((prev) => {
+								const newMessages = [...prev];
+								newMessages[assistantMessageIndex] = {
+									role: "assistant",
+									content: fullText,
+									sources,
+								};
+								return newMessages;
+							});
 						}
-
-						const assistantMessage: Message = {
-							role: "assistant",
-							content: data.answer,
-							sources: data.sources,
-						};
-						setMessages((prev) => [...prev, assistantMessage]);
-						return; // Success, exit the function
-					} else {
-						throw new Error(
-							data.error || data.message || "Failed to get response"
-						);
 					}
-				} catch (error: any) {
-					lastError = error;
+				},
+			});
 
-					// Don't retry on abort or if max retries reached
-					if (
-						error.name === "AbortError" ||
-						retries >= maxRetries ||
-						error.message.includes("Empty response")
-					) {
-						throw error;
-					}
-
-					// Wait before retrying (exponential backoff: 1s, 2s)
-					if (retries < maxRetries) {
-						const delay = Math.pow(2, retries) * 1000;
-						console.log(
-							`Retry attempt ${retries + 1}/${maxRetries} after ${delay}ms...`
-						);
-						await new Promise((resolve) => setTimeout(resolve, delay));
-					}
-				}
-			}
-
-			// If we get here, all retries failed
-			throw lastError || new Error("Failed to get response after retries");
+			// Ensure final message has all content
+			setMessages((prev) => {
+				const newMessages = [...prev];
+				newMessages[assistantMessageIndex] = {
+					role: "assistant",
+					content:
+						fullText ||
+						"I apologize, but I couldn't generate a response. Please try again.",
+					sources,
+				};
+				return newMessages;
+			});
 		} catch (error: any) {
 			console.error("Error sending message:", error);
 
-			let errorMessage: Message;
-			if (error.name === "AbortError") {
-				errorMessage = {
+			// Update the assistant message with error
+			setMessages((prev) => {
+				const newMessages = [...prev];
+				newMessages[assistantMessageIndex] = {
 					role: "assistant",
-					content:
-						"Sorry, the request took too long to process. The server might be busy. Please try again with a simpler question or wait a moment before retrying.",
+					content: `Sorry, I encountered an error: ${
+						error.message || "Unknown error"
+					}. Please try again.`,
 				};
-			} else if (error.message.includes("Failed to fetch")) {
-				errorMessage = {
-					role: "assistant",
-					content:
-						"Unable to connect to the chat service. Please check your internet connection and try again.",
-				};
-			} else if (error.message.includes("Empty response")) {
-				errorMessage = {
-					role: "assistant",
-					content:
-						"The server returned an empty response. Please try rephrasing your question.",
-				};
-			} else {
-				errorMessage = {
-					role: "assistant",
-					content: `Sorry, I encountered an error: ${error.message}. Please try again.`,
-				};
-			}
-
-			setMessages((prev) => [...prev, errorMessage]);
+				return newMessages;
+			});
 		} finally {
 			setIsLoading(false);
 		}
@@ -219,9 +200,9 @@ export default function DocsChatbot({
 									<MarkdownRenderer content={message.content} />
 								)}
 							</div>
-							{/* {message.role === "assistant" && (
+							{message.role === "assistant" && message.sources && (
 								<SourceHandler sources={message.sources} />
-							)} */}
+							)}
 						</div>
 					))}
 					{isLoading && (

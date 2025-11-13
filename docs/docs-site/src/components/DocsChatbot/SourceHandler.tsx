@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 import styles from "./SourceHandler.module.css";
-import { useHistory } from "@docusaurus/router";
 
 interface Source {
-	source: string;
 	title: string;
+	url: string;
 	content: string;
 }
 
@@ -25,33 +24,15 @@ export default function SourceHandler({ sources }: SourceHandlerProps) {
 		return null;
 	}
 
-	// Filter and deduplicate sources
+	// Filter and deduplicate sources by URL
 	const uniqueSources = Array.from(
-		new Map(sources.map((s) => [s.source, s])).values()
+		new Map(sources.map((s) => [s.url, s])).values()
 	);
 
-	const handleSourceClick = (sourceUrl: string) => {
-		// Normalize the URL - if it's a relative path or documentation path
-		let navigateUrl = sourceUrl;
-
-		// If it's already a full URL, open in new tab
-		if (sourceUrl.startsWith("http://") || sourceUrl.startsWith("https://")) {
-			window.open(sourceUrl, "_blank");
-			return;
-		}
-
-		// If it's a path like "docs/..." or "/docs/...", navigate within site
-		if (!navigateUrl.startsWith("/")) {
-			navigateUrl = "/" + navigateUrl;
-		}
-
-		// Use window.location for in-site navigation or redirect
-		if (navigateUrl.includes("docs/") || navigateUrl.includes("/docs/")) {
-			window.location.href = navigateUrl;
-		} else {
-			// Try to navigate using router or fallback to location
-			window.location.href = navigateUrl;
-		}
+	const handleSourceClick = (url: string) => {
+		// Navigate to the documentation page
+		// URLs are already formatted correctly (e.g., "/docs/getting-started")
+		window.location.href = url;
 	};
 
 	return (
@@ -78,24 +59,24 @@ export default function SourceHandler({ sources }: SourceHandlerProps) {
 						<div
 							key={idx}
 							className={styles.sourceItem}
-							onClick={() => handleSourceClick(source.source)}
+							onClick={() => handleSourceClick(source.url)}
 							role="button"
 							tabIndex={0}
 							onKeyDown={(e) => {
 								if (e.key === "Enter" || e.key === " ") {
-									handleSourceClick(source.source);
+									handleSourceClick(source.url);
 								}
 							}}
 						>
 							<div className={styles.sourceItemHeader}>
 								<strong className={styles.sourceTitle}>{source.title}</strong>
-								<span className={styles.sourceLink}>
-									{truncateUrl(source.source)}
-								</span>
+								<span className={styles.sourceLink}>{source.url}</span>
 								<span className={styles.clickHint}>→</span>
 							</div>
 							{source.content && (
-								<p className={styles.sourceContent}>{source.content}</p>
+								<p className={styles.sourceContent}>
+									{source.content.substring(0, 150)}...
+								</p>
 							)}
 						</div>
 					))}
@@ -103,21 +84,4 @@ export default function SourceHandler({ sources }: SourceHandlerProps) {
 			)}
 		</div>
 	);
-}
-
-/**
- * Truncate long URLs for display
- */
-function truncateUrl(url: string, maxLength: number = 40): string {
-	if (url.length <= maxLength) return url;
-
-	// Try to show the relevant part
-	const parts = url.split("/");
-	const filename = parts[parts.length - 1];
-
-	if (filename.length > maxLength) {
-		return "..." + filename.slice(-maxLength);
-	}
-
-	return "..." + url.slice(-maxLength);
 }

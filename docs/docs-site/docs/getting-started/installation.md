@@ -8,7 +8,7 @@ sidebar_position: 1
 
 Before you begin, ensure you have:
 
-- **Go 1.25+** installed
+- **Go 1.21+** installed
 - **PostgreSQL** (if using database features)
 - **Git** for version control
 
@@ -16,6 +16,42 @@ Check your Go version:
 
 ```bash
 go version
+```
+
+## Project Structure
+
+Create a new project with this recommended structure:
+
+```
+myapp/
+├── cmd/
+│   ├── api/
+│   │   └── main.go          # HTTP server entry point
+│   └── migration/
+│       └── main.go          # Migration runner (optional)
+├── internal/
+│   ├── domain/              # Domain models
+│   ├── repository/          # Data access layer
+│   ├── handler/             # HTTP handlers
+│   ├── modules/             # Fx modules for DI
+│   └── config/              # Config structs (optional)
+├── config/                  # Config files
+│   ├── config.development.json
+│   ├── config.staging.json
+│   └── config.production.json
+├── migrations/              # Database migrations (optional)
+├── .env.example             # Environment template
+├── .env                     # Environment variables (git-ignored)
+├── go.mod
+└── go.sum
+```
+
+Create this structure:
+
+```bash
+mkdir -p myapp/{cmd/{api,migration},internal/{domain,repository,handler,modules,config},migrations,config}
+cd myapp
+go mod init myapp
 ```
 
 ## Install go-infra
@@ -100,106 +136,24 @@ sudo systemctl start postgresql
 
 Download and install from [PostgreSQL Official Site](https://www.postgresql.org/download/windows/)
 
-## Additional Tools
+## Configuration Setup
 
-### Swagger CLI (for API documentation)
+go-infra uses **Viper** to load environment-aware configuration files.
 
-```bash
-go install github.com/swaggo/swag/cmd/swag@latest
-```
+### Step 1: Create `.env` File
 
-### Migration Tools
-
-**Goose (recommended):**
-
-```bash
-go install github.com/pressly/goose/v3/cmd/goose@latest
-```
-
-**Go-Migrate:**
-
-```bash
-# macOS
-brew install golang-migrate
-
-# Ubuntu/Debian
-curl -L https://github.com/golang-migrate/migrate/releases/download/v4.15.2/migrate.linux-amd64.tar.gz | tar xvz
-sudo mv migrate /usr/bin/migrate
-
-# Windows
-choco install migrate
-```
-
-### Air (for hot reload during development)
-
-```bash
-go install github.com/cosmtrek/air@latest
-```
-
-## Project Structure
-
-Create a new project with this recommended structure:
-
-```
-myapp/
-├── cmd/
-│   ├── api/
-│   │   └── main.go          # HTTP server entry point
-│   └── migration/
-│       └── main.go          # Migration runner
-├── internal/
-│   ├── domain/              # Domain models
-│   ├── repository/          # Data access layer
-│   ├── handler/             # HTTP handlers
-│   └── service/             # Business logic
-├── migrations/              # Database migrations
-├── config/                  # Configuration files
-├── .env.example             # Environment template
-├── go.mod
-└── go.sum
-```
-
-Create this structure:
-
-```bash
-mkdir -p myapp/{cmd/{api,migration},internal/{domain,repository,handler,service},migrations,config}
-cd myapp
-go mod init myapp
-```
-
-## Environment Configuration
-
-Create `.env.example`:
-
-```bash title=".env.example"
+```bash title=".env"
 # Application
 APP_ENV=development
-SERVICE_NAME=myapp
+APP_NAME=myapp
 
-# HTTP Server
-HTTP_PORT=8080
-HTTP_HOST=localhost
-
-# Database
-POSTGRES_HOST=localhost
-POSTGRES_PORT=5432
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=postgres
-POSTGRES_DB=myapp
-POSTGRES_SSLMODE=disable
-
-# JWT
-JWT_SECRET=your-secret-key-change-in-production
-JWT_ISSUER=myapp
-JWT_AUDIENCE=myapp-users
-JWT_ACCESS_EXPIRY=15m
-JWT_REFRESH_EXPIRY=7d
+# Note: HTTP/DB config is in config.development.json
 ```
 
-Copy to `.env`:
+Copy to `.env.example` for version control:
 
 ```bash
-cp .env.example .env
+cp .env .env.example
 ```
 
 :::tip
@@ -211,6 +165,194 @@ echo ".env" >> .gitignore
 
 :::
 
+### Step 2: Create Config File
+
+go-infra loads `config.<env>.json` based on your `APP_ENV`:
+
+```json title="config/config.development.json"
+{
+	"fiberHttpOptions": {
+		"port": ":8080",
+		"host": "localhost",
+		"basePath": "/api/v1",
+		"name": "My App",
+		"development": true,
+		"timeout": 30
+	},
+	"gormOptions": {
+		"type": 0,
+		"host": "localhost",
+		"port": 5432,
+		"user": "postgres",
+		"password": "postgres",
+		"dbname": "myapp",
+		"sslmode": false
+	},
+	"logOptions": {
+		"level": "debug",
+		"logType": 0,
+		"callerEnabled": true
+	}
+}
+```
+
+:::important Required Configuration
+The `config.<env>.json` file is **required** for most go-infra modules to work:
+
+- `customfiber.Module` requires `fiberHttpOptions`
+- `postgresgorm.Module` requires `gormOptions`
+- Logger uses `logOptions`
+
+Without this file, the application will fail to start.
+:::
+
+### Create Production Config
+
+```json title="config/config.production.json"
+{
+	"fiberHttpOptions": {
+		"port": ":8080",
+		"host": "0.0.0.0",
+		"basePath": "/api/v1",
+		"name": "My App",
+		"development": false,
+		"timeout": 60
+	},
+	"gormOptions": {
+		"type": 0,
+		"host": "db.production.com",
+		"port": 5432,
+		"user": "prod_user",
+		"password": "${DB_PASSWORD}",
+		"dbname": "myapp_prod",
+		"sslmode": true
+	},
+	"logOptions": {
+		"level": "info",
+		"logType": 0,
+		"callerEnabled": false
+	}
+}
+```
+
+### Environment Variable Overrides
+
+You can override config file values with environment variables:
+
+```bash
+# Override database password
+export DB_PASSWORD=secret-password
+
+# Override log level
+export LOG_LEVEL=debug
+```
+
+See [Configuration Management](../core-concepts/configuration) for complete details.
+
+## Database Migrations (Optional)
+
+go-infra has **built-in Goose support** for database migrations.
+
+### Setup Goose Migration Module
+
+```go title="cmd/api/main.go"
+import (
+    "github.com/phatnt199/go-infra/pkg/migration/goose"
+)
+
+func main() {
+    app := fxapp.NewApplicationBuilder().
+        ProvideModule(customfiber.Module).
+        ProvideModule(postgresgorm.Module).
+        ProvideModule(goose.Module).  // Built-in Goose support
+        Build()
+
+    app.Run()
+}
+```
+
+### Create Migration Files
+
+```bash
+# Create migrations directory
+mkdir -p migrations
+
+# Create migration file
+cat > migrations/00001_create_users_table.sql << 'EOF'
+-- +goose Up
+CREATE TABLE users (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- +goose Down
+DROP TABLE users;
+EOF
+```
+
+### Configure Migration Options
+
+Add to your `config.development.json`:
+
+```json
+{
+	"migrationOptions": {
+		"host": "localhost",
+		"port": 5432,
+		"user": "postgres",
+		"password": "postgres",
+		"dbName": "myapp",
+		"sslMode": false,
+		"migrationsDir": "migrations",
+		"skipMigration": false
+	}
+}
+```
+
+Migrations will run automatically on application start when `goose.Module` is included.
+
+:::tip
+Set `"skipMigration": true` to disable automatic migrations in production and run them manually.
+:::
+
+## Additional Tools
+
+### Air (Hot Reload for Development)
+
+```bash
+go install github.com/cosmtrek/air@latest
+```
+
+Create `.air.toml`:
+
+```toml title=".air.toml"
+root = "."
+tmp_dir = "tmp"
+
+[build]
+cmd = "go build -o ./tmp/main ./cmd/api"
+bin = "tmp/main"
+include_ext = ["go", "json"]
+exclude_dir = ["tmp", "vendor"]
+```
+
+Run with hot reload:
+
+```bash
+air
+```
+
+### Swagger (API Documentation)
+
+```bash
+go install github.com/swaggo/swag/cmd/swag@latest
+```
+
+See [API Documentation](../http-server/swagger) for setup.
+
 ## Verify Complete Setup
 
 Create a complete test application:
@@ -220,8 +362,8 @@ package main
 
 import (
     "github.com/phatnt199/go-infra/pkg/adapter/fxapp"
-    "github.com/phatnt199/go-infra/pkg/adapter/http/fiber_adapter"
-    "github.com/phatnt199/go-infra/pkg/infra/postgres/gorm"
+    customfiber "github.com/phatnt199/go-infra/pkg/adapter/http/fiber_adapter"
+    postgresgorm "github.com/phatnt199/go-infra/pkg/infra/postgres/gorm"
     "github.com/phatnt199/go-infra/pkg/logger"
 )
 
@@ -229,8 +371,8 @@ func main() {
     logger.Info("Starting application...")
 
     app := fxapp.NewApplicationBuilder().
-        ProvideModule(fiber_adapter.Module).
-        ProvideModule(gorm.Module).
+        ProvideModule(customfiber.Module).
+        ProvideModule(postgresgorm.Module).
         Build()
 
     app.Run()
@@ -240,22 +382,38 @@ func main() {
 Run it:
 
 ```bash
+go mod tidy
 go run cmd/api/main.go
 ```
 
 You should see:
 
-- Server starting on configured port
-- Database connection established
-- Application ready to accept requests
+```
+[INFO] Starting application...
+[INFO] My App is listening on Host:localhost Http PORT: :8080
+[INFO] Database connected
+```
 
 Visit `http://localhost:8080/health` to verify it's running.
 
 ## Troubleshooting
 
-### "Cannot find package"
+### "Config file not found"
 
-Make sure you've run:
+**Error:** `viper.ReadInConfig: No directory with config file found`
+
+**Solution:**
+
+1. Ensure `config/config.development.json` exists
+2. Set `APP_ENV=development` in `.env`
+3. Or set `CONFIG_PATH` explicitly:
+
+```bash
+export CONFIG_PATH=$(pwd)/config
+go run cmd/api/main.go
+```
+
+### "Cannot find package"
 
 ```bash
 go mod download
@@ -270,21 +428,97 @@ Verify PostgreSQL is running:
 # macOS/Linux
 psql -U postgres -h localhost
 
-# Check .env has correct credentials
+# Docker
+docker ps | grep postgres
 ```
+
+Check your `gormOptions` in `config.development.json` matches your database credentials.
 
 ### Port Already in Use
 
-Change the port in `.env`:
+Change the port in `config.development.json`:
+
+```json
+{
+  "fiberHttpOptions": {
+    "port": ":8081",
+    ...
+  }
+}
+```
+
+### Wrong Module Import Name
+
+**Error:** `undefined: fiber_adapter`
+
+**Solution:** Use `customfiber` instead:
+
+```go
+import customfiber "github.com/phatnt199/go-infra/pkg/adapter/http/fiber_adapter"
+
+// Then use:
+appBuilder.ProvideModule(customfiber.Module)
+```
+
+The package is named `customfiber` to avoid conflicts with the Fiber web framework.
+
+## Understanding go-infra Modules
+
+go-infra uses **Uber Fx** for dependency injection. Modules are self-contained units:
+
+```go
+// HTTP Server Module
+customfiber.Module       // Provides Fiber HTTP server
+
+// Database Module
+postgresgorm.Module      // Provides PostgreSQL with GORM
+
+// Migration Module
+goose.Module            // Provides Goose migrations (built-in)
+
+// Health Module
+health.Module           // Provides /health endpoint
+
+// Your Custom Module
+modules.Module          // Your app's business logic
+```
+
+Each module:
+
+- Loads its own configuration via `config.BindConfigKey`
+- Provides dependencies to the DI container
+- Registers lifecycle hooks (start/stop)
+
+See [Dependency Injection](../core-concepts/dependency-injection) for details.
+
+## Configuration Discovery
+
+go-infra automatically discovers configuration:
+
+1. **Loads `.env`** - Recursively searches from current directory upward
+2. **Reads `APP_ENV`** - Determines which config file to load
+3. **Finds `config.<env>.json`** - Searches project subdirectories from `APP_ROOT_PATH`
+4. **Loads with Viper** - Unmarshals into typed structs
+5. **Applies overrides** - Environment variables override file values
+
+**Recommended for production:**
 
 ```bash
-HTTP_PORT=8081
+# Set explicit paths to avoid filesystem search
+export CONFIG_PATH=/app/config
+export APP_ENV=production
+./myapp
 ```
+
+See [Configuration Management](../core-concepts/configuration) for complete details.
 
 ## Next Steps
 
-Now that you have go-infra installed, let's build something!
+Now that you have go-infra installed and configured:
 
-- **[Quick Start](./quick-start)** - Build your first API
-- **[Architecture](../core-concepts/architecture)** - Understand the framework
-- **[Examples](../examples/users-api)** - See real implementations
+- **[Quick Start](./quick-start)** - Build your first API in 10 minutes
+- **[Configuration Guide](../core-concepts/configuration)** - Deep dive into config system
+- **[Architecture](../core-concepts/architecture)** - Understand the framework design
+- **[Examples](../examples/users-api)** - See real-world implementations
+
+Happy coding! 🚀

@@ -60,14 +60,14 @@ package main
 
 import (
     "github.com/phatnt199/go-infra/pkg/adapter/fxapp"
-    "github.com/phatnt199/go-infra/pkg/adapter/http/fiber_adapter"
-    "github.com/phatnt199/go-infra/pkg/infra/postgres/gorm"
+    customfiber "github.com/phatnt199/go-infra/pkg/adapter/http/fiber_adapter"
+    postgresgorm "github.com/phatnt199/go-infra/pkg/infra/postgres/gorm"
 )
 
 func main() {
     app := fxapp.NewApplicationBuilder().
-        ProvideModule(fiber_adapter.Module).
-        ProvideModule(gorm.Module).
+        ProvideModule(customfiber.Module).
+        ProvideModule(postgresgorm.Module).
         Build()
 
     app.Run()
@@ -79,28 +79,32 @@ That's it! You now have:
 - ✅ HTTP server with Fiber
 - ✅ PostgreSQL database with GORM
 - ✅ Structured logging
-- ✅ Configuration management
+- ✅ Viper-powered configuration
 - ✅ Graceful shutdown
+
+**Note:** Requires a `config.development.json` file with `fiberHttpOptions` and `gormOptions`. See [Installation](./getting-started/installation) for setup.
 
 ## What's Inside?
 
 ### Core Packages
 
-| Package                      | Purpose                                         |
-| ---------------------------- | ----------------------------------------------- |
-| `adapter/fxapp`              | Application bootstrap with dependency injection |
-| `adapter/http/fiber_adapter` | HTTP server with Fiber                          |
-| `infra/postgres/gorm`        | PostgreSQL integration with GORM                |
-| `component/authentication`   | Complete auth system                            |
-| `logger`                     | Structured logging                              |
-| `crypto`                     | Security utilities                              |
-| `core/cqrs`                  | CQRS pattern with commands and queries          |
-| `otel`                       | OpenTelemetry metrics (experimental)            |
-| `mapper`                     | Object-to-object mapping with generics          |
-| `reflection`                 | Reflection utilities for advanced scenarios     |
-| `validator`                  | Struct validation wrapper                       |
-| `utils`                      | Pagination, errors, and common utilities        |
-| `migration`                  | Database migrations with Goose                  |
+| Package                      | Purpose                                                     |
+| ---------------------------- | ----------------------------------------------------------- |
+| `adapter/fxapp`              | Application bootstrap with dependency injection             |
+| `adapter/http/fiber_adapter` | HTTP server with Fiber (import as `customfiber`)            |
+| `infra/postgres/gorm`        | PostgreSQL integration with GORM (import as `postgresgorm`) |
+| `component/authentication`   | Complete auth system with JWT                               |
+| `application/config`         | Viper-based configuration with env support                  |
+| `application/environment`    | Environment detection and `.env` loading                    |
+| `logger`                     | Structured logging with Zap                                 |
+| `crypto`                     | Security utilities (JWT, hash, encryption)                  |
+| `core/cqrs`                  | CQRS pattern with commands and queries                      |
+| `migration/goose`            | Database migrations with Goose (built-in)                   |
+| `mapper`                     | Object-to-object mapping with generics                      |
+| `reflection`                 | Reflection utilities for advanced scenarios                 |
+| `validator`                  | Struct validation wrapper                                   |
+| `utils`                      | Pagination, errors, and common utilities                    |
+| `health`                     | Health check endpoints                                      |
 
 ## Who Should Use This?
 

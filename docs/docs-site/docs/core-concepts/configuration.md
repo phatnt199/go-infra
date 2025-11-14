@@ -40,664 +40,121 @@ type ServerConfig struct {
 type DatabaseConfig struct {
     Host     string `json:"host" env:"DB_HOST" default:"localhost"`
     Port     int    `json:"port" env:"DB_PORT" default:"5432"`
-    Username string `json:"username" env:"DB_USER" default:"postgres"`
-    Password string `json:"password" env:"DB_PASSWORD"`
-    Database string `json:"database" env:"DB_NAME" default:"myapp"`
-    SSLMode  string `json:"ssl_mode" env:"DB_SSL_MODE" default:"disable"`
-}
-
-type JWTConfig struct {
-    Secret     string `json:"secret" env:"JWT_SECRET"`
-    Expiration int    `json:"expiration" env:"JWT_EXPIRATION" default:"24"` // hours
-}
-
-type EmailConfig struct {
-    Host     string `json:"host" env:"EMAIL_HOST"`
-    Port     int    `json:"port" env:"EMAIL_PORT" default:"587"`
-    Username string `json:"username" env:"EMAIL_USER"`
-    Password string `json:"password" env:"EMAIL_PASSWORD"`
-    From     string `json:"from" env:"EMAIL_FROM"`
 }
 ```
 
-### Load Configuration
+## Bootstrapping the environment
+
+Go-infra provides two complementary configuration experiences:
+
+1. **Bootstrapping the environment** via `pkg/application/environment`, which loads `.env`, resolves `APP_ENV`, sets `APP_ROOT_PATH`, and exposes helpers for working with process variables.
+2. **Typed configuration structs** under `pkg/application/config`, which either bind a `config.<env>` file or read environment variables directly, complete with defaults, helper methods, and validation.
+
+Use whichever flow matches your service: many examples combine both (`ConfigAppEnv()` to prepare the environment and `config.BindConfig*` to load structured files), but you can just consume `config.Load` if all settings come from environment variables.
+
+## Key capabilities
+
+- **Environment discovery:** `environment.ConfigAppEnv()` recursively loads `.env` files using `godotenv`, writes the resolved `APP_ENV`/`APP_NAME`/`APP_ROOT_PATH` into Viper, and optionally changes the working directory through `FixProjectRootWorkingDirectoryPath()`.
+- **File binding with Viper:** `config.BindConfig`/`BindConfigKey` sets defaults via `go-defaults`, picks the right `config.<env>` file, unmarshals it through Viper, runs `viper.AutomaticEnv()`, and finally `env.Parse(cfg)` to honor `env` struct tags.
+- **Environment-only loader:** `config.Load()` (and helpers `LoadOnce`, `Get`, `Set`) reads environment variables (`APP_*`, `HTTP_*`, `DB_*`, `LOG_*`, `JWT_*`, etc.), applies defaults, validates each section (`validation.go`), and exposes helper methods such as `cfg.Server.HTTP.Address()` and `cfg.Database.DSN()`.
+
+### Example: Bootstrapping
+
+1. Start your application by calling `environment.ConfigAppEnv()`. It:
+   - loads a `.env` file located inside the current working directory or any parent directory,
+   - logs the detected `APP_ENV` and falls back to `development` when nothing is set,
+   - sets `APP_ROOT_PATH` based on either `APP_NAME` (if provided) or by searching for the nearest `go.mod`, and
+   - calls `FixProjectRootWorkingDirectoryPath()` so later helpers can rely on a stable root.
+2. Pass the returned `environment.Environment` value to other packages (or store it globally) so they all share the same view of `development`, `staging`, or `production`.
+3. Optionally set `CONFIG_PATH` to the directory that holds your `config.<env>.json` file. Without it, the binder walks from `APP_ROOT_PATH` until it finds the first directory that contains any `config.<env>.(json|yaml|yml)` file.
+4. Remember: `APP_ENV` in the OS environment overrides explicit values passed into the binder, so unset it only when you want the code-provided value to remain authoritative.
 
 ```go
-// config/loader.go
-package config
-
-import (
-    "encoding/json"
-    "fmt"
-    "os"
-    "github.com/joho/godotenv"
-)
-
-func Load() (*Config, error) {
-    // Load .env file if exists
-    _ = godotenv.Load()
-
-    // Get environment
-    env := os.Getenv("APP_ENV")
-    if env == "" {
-        env = "development"
-    }
-
-    // Load config file
-    configFile := fmt.Sprintf("config.%s.json", env)
-    cfg, err := loadFromFile(configFile)
-    if err != nil {
-        return nil, err
-    }
-
-    // Override with environment variables
-    overrideFromEnv(cfg)
-
-    // Validate
-    if err := validate(cfg); err != nil {
-        return nil, err
-    }
-
-    return cfg, nil
-}
-
-func loadFromFile(filename string) (*Config, error) {
-    data, err := os.ReadFile(filename)
-    if err != nil {
-        return nil, err
-    }
-
-    var cfg Config
-    if err := json.Unmarshal(data, &cfg); err != nil {
-        return nil, err
-    }
-
-    return &cfg, nil
-}
-
-func overrideFromEnv(cfg *Config) {
-    if val := os.Getenv("SERVER_PORT"); val != "" {
-        fmt.Sscanf(val, "%d", &cfg.Server.Port)
-    }
-    if val := os.Getenv("DB_HOST"); val != "" {
-        cfg.Database.Host = val
-    }
-    // ... more overrides
-}
-
-func validate(cfg *Config) error {
-    if cfg.JWT.Secret == "" {
-        return fmt.Errorf("JWT secret is required")
-    }
-    if cfg.Database.Password == "" {
-        return fmt.Errorf("database password is required")
-    }
-    return nil
+env := environment.ConfigAppEnv()
+cfg, err := config.BindConfigKey[*AppOptions](optionName, env)
+if err != nil {
+    log.Fatalf("unable to bind config: %v", err)
 }
 ```
 
-### Use Configuration
+## Binding configuration files
+
+`pkg/application/config/config_helper.go` handles file-based configuration.
+
+1. `BindConfig`/`BindConfigKey` creates the zero value of your struct and sets defaults through `go-defaults`.
+2. It determines the environment (explicit parameter or `constants.DEV_ENV`, then `APP_ENV` overrides) and resolves the directory where `config.<env>` lives:
+   - use `CONFIG_PATH` to point directly to the folder containing `config.development.json` (recommended for CI/Test), or
+   - omit `CONFIG_PATH` so the helper searches from `APP_ROOT_PATH` downwards for the first matching file.
+3. Viper loads `config.<env>.json` (the type is currently `json`) inside that directory, unmarshals it into your struct, and, after the file read, runs `viper.AutomaticEnv()`.
+4. After Viper, `env.Parse(cfg)` reads environment variables according to your `env:"..."` tags and overwrites any fields accordingly.
+5. Pass a `configKey` to read a named section instead of the entire file (examples use the `typemapper`/`strcase` helpers to derive keys such as `fiberHttpOptions`).
 
 ```go
-// main.go
-package main
+type AppOptions struct {
+    ServiceName  string `mapstructure:"serviceName" env:"ServiceName"`
+    DeliveryType string `mapstructure:"deliveryType" env:"DeliveryType" default:"http"`
+}
 
-import (
-    "log"
-    "myapp/config"
-)
-
-func main() {
-    // Load configuration
-    cfg, err := config.Load()
-    if err != nil {
-        log.Fatal("Failed to load config:", err)
-    }
-
-    // Use configuration
-    log.Printf("Starting server on %s:%d", cfg.Server.Host, cfg.Server.Port)
-
-    // Setup database with config
-    db := setupDatabase(cfg.Database)
-
-    // Start server
-    app.Listen(fmt.Sprintf(":%d", cfg.Server.Port))
+func NewAppOptions(env environment.Environment) (*AppOptions, error) {
+    optionName := strcase.ToLowerCamel(typemapper.GetGenericTypeNameByT[AppOptions]())
+    return config.BindConfigKey[*AppOptions](optionName, env)
 }
 ```
 
-## Configuration Files
+Any environment variable that matches the `env` tag (case sensitive) or a Viper key wins over the file contents, and the helper prints parsing errors to help you diagnose missing overrides.
 
-### Development Config
+## Environment-driven loader (`pkg/application/config`)
 
-```json
-// config.development.json
-{
-	"environment": "development",
-	"server": {
-		"host": "localhost",
-		"port": 3000
-	},
-	"database": {
-		"host": "localhost",
-		"port": 5432,
-		"username": "postgres",
-		"password": "postgres",
-		"database": "myapp_dev",
-		"ssl_mode": "disable"
-	},
-	"jwt": {
-		"secret": "dev-secret-key-change-in-production",
-		"expiration": 24
-	},
-	"email": {
-		"host": "smtp.mailtrap.io",
-		"port": 2525,
-		"username": "your-mailtrap-username",
-		"password": "your-mailtrap-password",
-		"from": "noreply@myapp.dev"
-	}
-}
-```
+If your service prefers to configure itself entirely from environment variables, `config.Load()` is the standard entry point. It builds a `Config` with the following sections (all validated via `validation.go` & defaults baked into the loader functions):
 
-### Production Config
+- App — `APP_NAME`, `APP_VERSION`, `APP_ENV`, `APP_DEBUG`, `APP_TIMEZONE`, `APP_TIMEOUT`
+- Server — HTTP (host/port/timeouts/CORS/TLS) and gRPC (host/port/keepalives)
+- Database — driver, host, port, credentials, pooling, migration path
+- Redis — host, port, password, pool settings, TLS
+- Queue — driver, URL, concurrency, retries
+- Storage — driver (S3/MinIO/GCS/local), credentials, bucket, SSL
+- Logger — log level/format/output paths, caller/stacktrace toggles that adjust defaults based on `APP_ENV`
+- Auth — JWT secrets/keys, OAuth providers, session cookies, password policies
 
-```json
-// config.production.json
-{
-	"environment": "production",
-	"server": {
-		"host": "0.0.0.0",
-		"port": 8080
-	},
-	"database": {
-		"host": "${DB_HOST}",
-		"port": 5432,
-		"username": "${DB_USER}",
-		"password": "${DB_PASSWORD}",
-		"database": "${DB_NAME}",
-		"ssl_mode": "require"
-	},
-	"jwt": {
-		"secret": "${JWT_SECRET}",
-		"expiration": 1
-	},
-	"email": {
-		"host": "${EMAIL_HOST}",
-		"port": 587,
-		"username": "${EMAIL_USER}",
-		"password": "${EMAIL_PASSWORD}",
-		"from": "${EMAIL_FROM}"
-	}
-}
-```
-
-## Environment Variables
-
-### .env File
-
-```bash
-# .env
-APP_ENV=development
-
-# Server
-SERVER_HOST=localhost
-SERVER_PORT=3000
-
-# Database
-DB_HOST=localhost
-DB_PORT=5432
-DB_USER=postgres
-DB_PASSWORD=postgres
-DB_NAME=myapp_dev
-DB_SSL_MODE=disable
-
-# JWT
-JWT_SECRET=your-secret-key-here
-JWT_EXPIRATION=24
-
-# Email
-EMAIL_HOST=smtp.gmail.com
-EMAIL_PORT=587
-EMAIL_USER=your-email@gmail.com
-EMAIL_PASSWORD=your-app-password
-EMAIL_FROM=noreply@myapp.com
-```
-
-### Loading .env File
+Helper methods such as `cfg.App.IsProduction()`, `cfg.Server.HTTP.Address()`, `cfg.Database.DSN()`, and `cfg.Redis.Address()` simplify downstream code.
 
 ```go
-import "github.com/joho/godotenv"
-
-func init() {
-    // Load .env file
-    if err := godotenv.Load(); err != nil {
-        log.Println("No .env file found")
-    }
+cfg, err := config.Load()
+if err != nil {
+    log.Fatalf("config error: %v", err)
+}
+log.Printf("starting %s/%s", cfg.App.Name, cfg.App.Environment)
+httpServer := http.Server{
+    Addr:         cfg.Server.HTTP.Address(),
+    ReadTimeout:  cfg.Server.HTTP.ReadTimeout,
+    WriteTimeout: cfg.Server.HTTP.WriteTimeout,
 }
 ```
 
-## Using Viper
+Use `config.LoadOnce()`/`config.Get()` when you need a cached version (e.g., tests). Call `config.Set` with a handcrafted `*config.Config` to inject deterministic values during unit tests.
 
-For more advanced configuration management, use Viper:
+## Example workflow
 
-```go
-// config/viper.go
-package config
+1. Copy or create a `.env` file in your repo or export the relevant environment variables (APP*ENV, HTTP*_, DB\__, etc.).
+2. Run `go run ./examples/env-usage` (or your service entrypoint) — the example illustrates four modes (default, explicit env, `.env`/APP_ENV overrides, and config binding).
+3. When a config file is involved, place it beside your service config directory (see `examples/users-api/internal/config/config.development.json`).
+4. Prefer setting `CONFIG_PATH` before running the binder (`export CONFIG_PATH=$(pwd)/examples/users-api/internal/config`) so you avoid the repo scan, and then call `config.BindConfig*`.
+5. The builder layers expect you to reuse the same `environment.Environment` value so logging, metrics, and other components can read the same `APP_ENV` value.
 
-import (
-    "github.com/spf13/viper"
-)
+## Best practices & troubleshooting
 
-func LoadWithViper() (*Config, error) {
-    viper.SetConfigName("config")
-    viper.SetConfigType("json")
-    viper.AddConfigPath(".")
-    viper.AddConfigPath("./config")
+- **Pin `CONFIG_PATH` or pass explicit directories in CLI/test scripts** so Viper doesn’t perform a costly filesystem walk and you always load the right file.
+- **Remember `FixProjectRootWorkingDirectoryPath()` can `chdir`**; running from the repo root and setting `CONFIG_PATH` avoids surprises with `.env` loading.
+- **Keep secrets out of source control** and prefer environment variables, `env` tags, or injected secrets (Vault/SecretsManager) when necessary.
+- **Override after file loads:** config files are read first, followed by `viper.AutomaticEnv()` and `env.Parse`, so the most specific override wins.
+- **Validation errors are helpful:** the loader aggregates field-level messages (e.g., `server.http.port` or `auth.jwt.secret`). Treat them as fatal during startup.
+- **Use the helpers:** `cfg.Server.HTTP.Address()` and `cfg.Database.DSN()` avoid repeated formatting logic.
 
-    // Enable environment variable override
-    viper.AutomaticEnv()
+## Related examples
 
-    // Read config file
-    if err := viper.ReadInConfig(); err != nil {
-        return nil, err
-    }
+- `examples/env-usage` documents the `.env` discovery logic, how `APP_ENV` interacts with explicit parameters, and how to force `CONFIG_PATH` for reproducible runs.
+- `examples/authentication-service/config` and `examples/microservices/userservice/config` show real config structs (with `mapstructure`/`env` tags) and how to call `config.BindConfigKey` for each section.
 
-    // Unmarshal into struct
-    var cfg Config
-    if err := viper.Unmarshal(&cfg); err != nil {
-        return nil, err
-    }
+## Learn more
 
-    return &cfg, nil
-}
-
-// Watch for config changes
-func WatchConfig(onChange func(*Config)) {
-    viper.WatchConfig()
-    viper.OnConfigChange(func(e fsnotify.Event) {
-        var cfg Config
-        viper.Unmarshal(&cfg)
-        onChange(&cfg)
-    })
-}
-```
-
-## go-infra Environment Package
-
-Use the built-in environment package:
-
-```go
-import (
-    "github.com/phatnt199/go-infra/pkg/application/environment"
-    "github.com/phatnt199/go-infra/pkg/application/config"
-)
-
-func main() {
-    // Load environment
-    env.Load()
-
-    // Get environment value
-    dbHost := env.GetString("DB_HOST", "localhost")
-    dbPort := env.GetInt("DB_PORT", 5432)
-
-    // Get required value (panics if not found)
-    jwtSecret := env.MustGetString("JWT_SECRET")
-
-    // Check environment
-    if env.IsDevelopment() {
-        log.Println("Running in development mode")
-    }
-
-    if env.IsProduction() {
-        log.Println("Running in production mode")
-    }
-}
-```
-
-## Configuration Validation
-
-### Using struct tags
-
-```go
-import "github.com/go-playground/validator/v10"
-
-type Config struct {
-    Server   ServerConfig   `validate:"required"`
-    Database DatabaseConfig `validate:"required"`
-}
-
-type ServerConfig struct {
-    Host string `validate:"required,hostname"`
-    Port int    `validate:"required,min=1,max=65535"`
-}
-
-func validate(cfg *Config) error {
-    validate := validator.New()
-    return validate.Struct(cfg)
-}
-```
-
-### Custom validation
-
-```go
-func validate(cfg *Config) error {
-    if cfg.JWT.Secret == "" || len(cfg.JWT.Secret) < 32 {
-        return fmt.Errorf("JWT secret must be at least 32 characters")
-    }
-
-    if cfg.Database.Password == "" {
-        return fmt.Errorf("database password is required")
-    }
-
-    if cfg.Server.Port < 1 || cfg.Server.Port > 65535 {
-        return fmt.Errorf("invalid server port: %d", cfg.Server.Port)
-    }
-
-    return nil
-}
-```
-
-## Secrets Management
-
-### Using Environment Variables
-
-```go
-// Never commit secrets to git
-// Use environment variables in production
-
-// .env.example (commit this)
-JWT_SECRET=your-secret-here
-DB_PASSWORD=your-password-here
-
-// .env (do NOT commit this)
-JWT_SECRET=actual-production-secret
-DB_PASSWORD=actual-production-password
-```
-
-### Using AWS Secrets Manager
-
-```go
-import (
-    "github.com/aws/aws-sdk-go/aws"
-    "github.com/aws/aws-sdk-go/aws/session"
-    "github.com/aws/aws-sdk-go/service/secretsmanager"
-)
-
-func loadSecretsFromAWS(secretName string) (map[string]string, error) {
-    sess := session.Must(session.NewSession())
-    svc := secretsmanager.New(sess)
-
-    input := &secretsmanager.GetSecretValueInput{
-        SecretId: aws.String(secretName),
-    }
-
-    result, err := svc.GetSecretValue(input)
-    if err != nil {
-        return nil, err
-    }
-
-    var secrets map[string]string
-    json.Unmarshal([]byte(*result.SecretString), &secrets)
-
-    return secrets, nil
-}
-```
-
-## Feature Flags
-
-Implement feature flags in configuration:
-
-```go
-type Config struct {
-    Features FeatureFlags `json:"features"`
-}
-
-type FeatureFlags struct {
-    EnableNewUI      bool `json:"enable_new_ui" env:"FEATURE_NEW_UI"`
-    EnableBetaAPI    bool `json:"enable_beta_api" env:"FEATURE_BETA_API"`
-    EnableRateLimiting bool `json:"enable_rate_limiting" env:"FEATURE_RATE_LIMITING"`
-}
-
-// Usage
-func (h *Handler) GetUser(c *fiber.Ctx) error {
-    if h.config.Features.EnableNewUI {
-        return h.getUserNewUI(c)
-    }
-    return h.getUserLegacy(c)
-}
-```
-
-## Multi-Environment Setup
-
-### Directory Structure
-
-```
-config/
-├── config.go              # Config structs
-├── loader.go              # Loading logic
-├── config.development.json
-├── config.staging.json
-├── config.production.json
-└── .env.example
-```
-
-### Environment Detection
-
-```go
-func getEnvironment() string {
-    env := os.Getenv("APP_ENV")
-    if env == "" {
-        env = os.Getenv("GO_ENV")
-    }
-    if env == "" {
-        env = "development"
-    }
-    return env
-}
-
-func isDevelopment() bool {
-    return getEnvironment() == "development"
-}
-
-func isProduction() bool {
-    return getEnvironment() == "production"
-}
-```
-
-## Best Practices
-
-### 1. Never Commit Secrets
-
-```bash
-# .gitignore
-.env
-config.local.json
-*.secret.json
-```
-
-### 2. Use Defaults
-
-```go
-type Config struct {
-    Port int `json:"port" default:"3000"`
-}
-```
-
-### 3. Document Configuration
-
-```go
-// Config holds application configuration
-type Config struct {
-    // Server configuration
-    Server ServerConfig `json:"server"`
-
-    // Database connection settings
-    Database DatabaseConfig `json:"database"`
-
-    // JWT token configuration
-    // Secret must be at least 32 characters
-    JWT JWTConfig `json:"jwt"`
-}
-```
-
-### 4. Validate Early
-
-```go
-func main() {
-    cfg, err := config.Load()
-    if err != nil {
-        log.Fatal("Configuration error:", err)
-    }
-
-    // Validate immediately
-    if err := cfg.Validate(); err != nil {
-        log.Fatal("Invalid configuration:", err)
-    }
-
-    // Now safe to use
-}
-```
-
-### 5. Use Type-Safe Access
-
-```go
-// ✅ Good - type-safe
-cfg.Server.Port  // int
-
-// ❌ Bad - string parsing
-port, _ := strconv.Atoi(os.Getenv("PORT"))
-```
-
-## Example: Complete Configuration Setup
-
-```go
-// config/config.go
-package config
-
-import (
-    "encoding/json"
-    "fmt"
-    "os"
-    "github.com/joho/godotenv"
-)
-
-type Config struct {
-    Environment string         `json:"environment"`
-    Server      ServerConfig   `json:"server"`
-    Database    DatabaseConfig `json:"database"`
-    Redis       RedisConfig    `json:"redis"`
-    JWT         JWTConfig      `json:"jwt"`
-    Email       EmailConfig    `json:"email"`
-    Features    FeatureFlags   `json:"features"`
-}
-
-type ServerConfig struct {
-    Host         string `json:"host" env:"SERVER_HOST" default:"localhost"`
-    Port         int    `json:"port" env:"SERVER_PORT" default:"3000"`
-    ReadTimeout  int    `json:"read_timeout" default:"30"`
-    WriteTimeout int    `json:"write_timeout" default:"30"`
-}
-
-type DatabaseConfig struct {
-    Host            string `json:"host" env:"DB_HOST" default:"localhost"`
-    Port            int    `json:"port" env:"DB_PORT" default:"5432"`
-    Username        string `json:"username" env:"DB_USER" default:"postgres"`
-    Password        string `json:"password" env:"DB_PASSWORD"`
-    Database        string `json:"database" env:"DB_NAME" default:"myapp"`
-    SSLMode         string `json:"ssl_mode" env:"DB_SSL_MODE" default:"disable"`
-    MaxOpenConns    int    `json:"max_open_conns" default:"25"`
-    MaxIdleConns    int    `json:"max_idle_conns" default:"5"`
-    ConnMaxLifetime int    `json:"conn_max_lifetime" default:"300"`
-}
-
-type RedisConfig struct {
-    Host     string `json:"host" env:"REDIS_HOST" default:"localhost"`
-    Port     int    `json:"port" env:"REDIS_PORT" default:"6379"`
-    Password string `json:"password" env:"REDIS_PASSWORD"`
-    DB       int    `json:"db" env:"REDIS_DB" default:"0"`
-}
-
-type JWTConfig struct {
-    Secret          string `json:"secret" env:"JWT_SECRET"`
-    AccessExpiration  int  `json:"access_expiration" default:"15"`   // minutes
-    RefreshExpiration int  `json:"refresh_expiration" default:"168"` // hours
-}
-
-type EmailConfig struct {
-    Host     string `json:"host" env:"EMAIL_HOST"`
-    Port     int    `json:"port" env:"EMAIL_PORT" default:"587"`
-    Username string `json:"username" env:"EMAIL_USER"`
-    Password string `json:"password" env:"EMAIL_PASSWORD"`
-    From     string `json:"from" env:"EMAIL_FROM"`
-}
-
-type FeatureFlags struct {
-    EnableNewUI     bool `json:"enable_new_ui" env:"FEATURE_NEW_UI"`
-    EnableBetaAPI   bool `json:"enable_beta_api" env:"FEATURE_BETA_API"`
-    EnableCaching   bool `json:"enable_caching" env:"FEATURE_CACHING"`
-}
-
-var instance *Config
-
-func Load() (*Config, error) {
-    if instance != nil {
-        return instance, nil
-    }
-
-    // Load .env
-    _ = godotenv.Load()
-
-    // Get environment
-    env := os.Getenv("APP_ENV")
-    if env == "" {
-        env = "development"
-    }
-
-    // Load config file
-    filename := fmt.Sprintf("config.%s.json", env)
-    cfg, err := loadFromFile(filename)
-    if err != nil {
-        return nil, err
-    }
-
-    cfg.Environment = env
-
-    // Override with env vars
-    overrideFromEnv(cfg)
-
-    // Validate
-    if err := cfg.Validate(); err != nil {
-        return nil, err
-    }
-
-    instance = cfg
-    return cfg, nil
-}
-
-func (c *Config) Validate() error {
-    if c.JWT.Secret == "" || len(c.JWT.Secret) < 32 {
-        return fmt.Errorf("JWT secret must be at least 32 characters")
-    }
-    if c.Database.Password == "" {
-        return fmt.Errorf("database password is required")
-    }
-    if c.Server.Port < 1 || c.Server.Port > 65535 {
-        return fmt.Errorf("invalid server port: %d", c.Server.Port)
-    }
-    return nil
-}
-
-func (c *Config) IsProduction() bool {
-    return c.Environment == "production"
-}
-
-func (c *Config) IsDevelopment() bool {
-    return c.Environment == "development"
-}
-```
-
-## Next Steps
-
-- Learn about [Error Handling](./error-handling)
-- Explore [Module System](./modules)
-- See [Deployment Guide](../deployment/production)
+- The rest of the docs site explores deployment, observability, and error handling; when you add a new config option, add it under `pkg/application/config` and ensure the validator surface is updated.

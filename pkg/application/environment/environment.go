@@ -33,7 +33,8 @@ func ConfigAppEnv(environments ...Environment) Environment {
 	viper.AutomaticEnv()
 
 	// https://articles.wesionary.team/environment-variable-configuration-in-your-golang-project-using-viper-4e8289ef664d
-	// load environment variables form .env files to system environment variables, it just finds `.env` file in our current `executing working directory` in our app for example `catalogs_service`
+	// load environment variables form .env files to system environment variables, it just finds `.env` file in our current
+	// `executing working directory` in our app for example `users_service`
 	err := loadEnvFilesRecursive()
 	if err != nil {
 		log.Printf(".env file cannot be found, err: %v", err)

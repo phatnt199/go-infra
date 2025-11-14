@@ -6,6 +6,10 @@ interface CodeBlockProps {
 	language?: string;
 }
 
+/**
+ * Renders code blocks with syntax highlighting from rehype-highlight
+ * Provides copy-to-clipboard functionality
+ */
 export default function CodeBlock({ code, language = "" }: CodeBlockProps) {
 	const [copied, setCopied] = useState(false);
 
@@ -29,7 +33,9 @@ export default function CodeBlock({ code, language = "" }: CodeBlockProps) {
 				</button>
 			</div>
 			<pre className={styles.codeBlock}>
-				<code className={language ? `language-${language}` : ""}>{code}</code>
+				<code className={language ? `hljs language-${language}` : "hljs"}>
+					{code}
+				</code>
 			</pre>
 		</div>
 	);

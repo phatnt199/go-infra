@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import "highlight.js/styles/atom-one-dark.css";
 import styles from "./DocsChatbot.module.css";
 import MarkdownRenderer from "./MarkdownRenderer";
 import SourceHandler from "./SourceHandler";

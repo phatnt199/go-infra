@@ -78,6 +78,12 @@
   font-size: inherit;
 }
 
+/* Rehype-highlight styling */
+.codeBlock code.hljs {
+  display: block;
+  overflow: visible;
+}
+
 /* Dark mode adjustments */
 [data-theme="dark"] .codeBlockHeader {
   background: var(--ifm-background-surface-color);

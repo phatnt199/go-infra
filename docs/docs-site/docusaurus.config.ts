@@ -44,21 +44,8 @@ const config: Config = {
 					routeBasePath: "docs",
 					editUrl: "https://github.com/phatnt199/go-infra/tree/main/docs-site/",
 				},
-				blog: {
-					showReadingTime: true,
-					feedOptions: {
-						type: ["rss", "atom"],
-						xslt: true,
-					},
-					// Please change this to your repo.
-					// Remove this to remove the "edit this page" links.
-					editUrl:
-						"https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/",
-					// Useful options to enforce blogging best practices
-					onInlineTags: "warn",
-					onInlineAuthors: "warn",
-					onUntruncatedBlogPosts: "warn",
-				},
+				// Blog is disabled because the site does not use blogging features
+				blog: false,
 				theme: {
 					customCss: "./src/css/custom.css",
 				},

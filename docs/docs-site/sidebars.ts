@@ -73,7 +73,19 @@ const sidebars: SidebarsConfig = {
 			type: "category",
 			label: "Components",
 			items: [
-				"components/logger",
+				{
+					type: "category",
+					label: "Logger",
+					items: [
+						"components/logger/index",
+						"components/logger/quickstart",
+						"components/logger/configuration",
+						"components/logger/usage",
+						"components/logger/fx-integration",
+						"components/logger/adapters",
+						"components/logger/best-practices",
+					],
+				},
 				"components/crypto",
 				"components/health",
 				"components/mapper",

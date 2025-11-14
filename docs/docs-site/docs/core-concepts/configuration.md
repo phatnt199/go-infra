@@ -240,11 +240,11 @@ import (
 )
 
 func main() {
-    app := fxapp.NewApplicationBuilder().
-        ProvideModule(config.Module).        // Load config first
-        ProvideModule(customfiber.Module).   // Uses FiberHttpOptions
-        ProvideModule(postgresgorm.Module).  // Uses GormOptions
-        Build()
+    appBuilder := fxapp.NewApplicationBuilder()
+    appBuilder.ProvideModule(config.Module)        // Load config first
+    appBuilder.ProvideModule(customfiber.Module)   // Uses FiberHttpOptions
+    appBuilder.ProvideModule(postgresgorm.Module)  // Uses GormOptions
+    app := appBuilder.Build()
 
     app.Run()
 }

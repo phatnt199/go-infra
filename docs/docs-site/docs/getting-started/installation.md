@@ -84,11 +84,12 @@ Create a simple test file:
 package main
 
 import (
-    "github.com/phatnt199/go-infra/pkg/logger"
+    defaultlogger "github.com/phatnt199/go-infra/pkg/logger/default_logger"
 )
 
 func main() {
-    logger.Info("go-infra installed successfully!")
+    log := defaultlogger.GetLogger()
+    log.Info("go-infra installed successfully!")
 }
 ```
 
@@ -261,11 +262,13 @@ import (
 )
 
 func main() {
-    app := fxapp.NewApplicationBuilder().
-        ProvideModule(customfiber.Module).
-        ProvideModule(postgresgorm.Module).
-        ProvideModule(goose.Module).  // Built-in Goose support
-        Build()
+    appBuilder := fxapp.NewApplicationBuilder()
+
+    appBuilder.ProvideModule(customfiber.Module).
+    appBuilder.ProvideModule(postgresgorm.Module).
+    appBuilder.ProvideModule(goose.Module).  // Built-in Goose support
+
+		app := appBuilder.Build()
 
     app.Run()
 }
@@ -364,16 +367,19 @@ import (
     "github.com/phatnt199/go-infra/pkg/adapter/fxapp"
     customfiber "github.com/phatnt199/go-infra/pkg/adapter/http/fiber_adapter"
     postgresgorm "github.com/phatnt199/go-infra/pkg/infra/postgres/gorm"
-    "github.com/phatnt199/go-infra/pkg/logger"
 )
 
 func main() {
-    logger.Info("Starting application...")
+    // Create application builder (includes logger)
+    appBuilder := fxapp.NewApplicationBuilder()
+    log := appBuilder.Logger()
 
-    app := fxapp.NewApplicationBuilder().
-        ProvideModule(customfiber.Module).
-        ProvideModule(postgresgorm.Module).
-        Build()
+    log.Info("Starting application...")
+
+    // Build app with modules
+    appBuilder.ProvideModule(customfiber.Module)
+    appBuilder.ProvideModule(postgresgorm.Module)
+    app := appBuilder.Build()
 
     app.Run()
 }

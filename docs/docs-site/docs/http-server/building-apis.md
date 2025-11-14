@@ -17,9 +17,9 @@ import (
 )
 
 func main() {
-    app := fxapp.NewApplicationBuilder().
-        ProvideModule(fiber_adapter.Module).
-        Build()
+    appBuilder := fxapp.NewApplicationBuilder()
+    appBuilder.ProvideModule(fiber_adapter.Module)
+    app := appBuilder.Build()
 
     app.Run()
 }
@@ -92,7 +92,9 @@ func (h *UserHandler) CreateUser(c *fiber.Ctx) error {
         })
     }
 
-    h.logger.Info("Creating user", logger.String("email", req.Email))
+    h.logger.Infow("Creating user", logger.Fields{
+        "email": req.Email,
+    })
 
     return c.Status(201).JSON(fiber.Map{
         "message": "User created",
@@ -116,11 +118,11 @@ import (
 )
 
 func main() {
-    app := fxapp.NewApplicationBuilder().
-        ProvideModule(fiber_adapter.Module).
-        Provide(handler.NewUserHandler).
-        Provide(fx.Invoke(setupRoutes)).
-        Build()
+    appBuilder := fxapp.NewApplicationBuilder()
+    appBuilder.ProvideModule(fiber_adapter.Module)
+    appBuilder.Provide(handler.NewUserHandler)
+    appBuilder.Provide(fx.Invoke(setupRoutes))
+    app := appBuilder.Build()
 
     app.Run()
 }
@@ -352,25 +354,25 @@ api.Get("/users", handler.GetUsers)
 ### Custom Middleware
 
 ```go
-func LoggingMiddleware() fiber.Handler {
+func LoggingMiddleware(log logger.Logger) fiber.Handler {
     return func(c *fiber.Ctx) error {
         start := time.Now()
 
         // Before request
-        logger.Info("Request started",
-            logger.String("method", c.Method()),
-            logger.String("path", c.Path()),
-        )
+        log.Infow("Request started", logger.Fields{
+            "method": c.Method(),
+            "path": c.Path(),
+        })
 
         // Process request
         err := c.Next()
 
         // After request
         duration := time.Since(start)
-        logger.Info("Request completed",
-            logger.Duration("duration", duration),
-            logger.Int("status", c.Response().StatusCode()),
-        )
+        log.Infow("Request completed", logger.Fields{
+            "duration_ms": duration.Milliseconds(),
+            "status": c.Response().StatusCode(),
+        })
 
         return err
     }
@@ -446,11 +448,11 @@ func ErrorHandler() fiber.ErrorHandler {
         }
 
         // Log error
-        logger.Error("Request error",
-            logger.Err(err),
-            logger.String("path", c.Path()),
-            logger.Int("status", code),
-        )
+        log.Errorw("Request error", logger.Fields{
+            "error": err.Error(),
+            "path": c.Path(),
+            "status": code,
+        })
 
         // Return error response
         return c.Status(code).JSON(fiber.Map{
@@ -459,9 +461,10 @@ func ErrorHandler() fiber.ErrorHandler {
     }
 }
 
-// Register error handler
+// Register error handler with logger
+log := defaultlogger.GetLogger()
 app := fiber.New(fiber.Config{
-    ErrorHandler: ErrorHandler(),
+    ErrorHandler: ErrorHandler(log),
 })
 ```
 
@@ -598,11 +601,11 @@ import (
 )
 
 func main() {
-    app := fxapp.NewApplicationBuilder().
-        ProvideModule(fiber_adapter.Module).
-        Provide(handler.NewUserHandler).
-        Provide(fx.Invoke(setupRoutes)).
-        Build()
+    appBuilder := fxapp.NewApplicationBuilder()
+    appBuilder.ProvideModule(fiber_adapter.Module)
+    appBuilder.Provide(handler.NewUserHandler)
+    appBuilder.Provide(fx.Invoke(setupRoutes))
+    app := appBuilder.Build()
 
     app.Run()
 }
@@ -645,24 +648,24 @@ func LoggingMiddleware(log logger.Logger) fiber.Handler {
 
         err := c.Next()
 
-        log.Info("Request",
-            logger.String("method", c.Method()),
-            logger.String("path", c.Path()),
-            logger.Int("status", c.Response().StatusCode()),
-            logger.Duration("duration", time.Since(start)),
-        )
+        log.Infow("Request", logger.Fields{
+            "method": c.Method(),
+            "path": c.Path(),
+            "status": c.Response().StatusCode(),
+            "duration_ms": time.Since(start).Milliseconds(),
+        })
 
         return err
     }
 }
 
-func RecoveryMiddleware() fiber.Handler {
+func RecoveryMiddleware(log logger.Logger) fiber.Handler {
     return func(c *fiber.Ctx) error {
         defer func() {
             if r := recover(); r != nil {
-                logger.Error("Panic recovered",
-                    logger.Any("panic", r),
-                )
+                log.Errorw("Panic recovered", logger.Fields{
+                    "panic": r,
+                })
                 c.Status(500).JSON(fiber.Map{
                     "error": "Internal server error",
                 })

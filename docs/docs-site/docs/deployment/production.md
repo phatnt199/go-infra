@@ -552,15 +552,28 @@ migrate -path migrations \
 ## Logging
 
 ```go
-import "github.com/phatnt199/go-infra/pkg/logger"
+import (
+    "github.com/phatnt199/go-infra/pkg/logger"
+    zaplogger "github.com/phatnt199/go-infra/pkg/logger/zap"
+    "go.uber.org/fx"
+)
 
-// Initialize structured logging for production
-logger.Init()
+// Production logger with Fx
+func main() {
+    app := fx.New(
+        zaplogger.Module,
+        fx.Invoke(runApp),
+    )
+    app.Run()
+}
 
-// Use throughout application
-logger.Info("Server started",
-    logger.Field("port", cfg.Server.Port),
-    logger.Field("environment", cfg.Environment))
+func runApp(log logger.Logger) {
+    // Structured logging
+    log.Infow("Server started", logger.Fields{
+        "port": cfg.Server.Port,
+        "environment": cfg.Environment,
+    })
+}
 ```
 
 ## Security Checklist

@@ -256,7 +256,7 @@ func setupRoutes(
             users.Get("/:id", userHandler.GetUser)
             users.Post("/", userHandler.CreateUser)
 
-            logger.Info("Routes registered successfully")
+            log.Info("Routes registered successfully")
         }
     })
 }

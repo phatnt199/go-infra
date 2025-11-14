@@ -98,7 +98,8 @@ type User struct {
 }
 
 func main() {
-    logger.Init()
+    // Initialize logger
+    appLog := defaultlogger.GetLogger()
 
     // Database connection
     dsn := "host=localhost port=5432 user=postgres password=postgres dbname=users"
@@ -137,7 +138,7 @@ import (
     "log"
     "github.com/phatnt199/go-infra/pkg/adapter/http/fiber"
     "github.com/phatnt199/go-infra/pkg/adapter/http/crud"
-    "github.com/phatnt199/go-infra/pkg/logger"
+    defaultlogger "github.com/phatnt199/go-infra/pkg/logger/default_logger"
     "gorm.io/driver/postgres"
     "gorm.io/gorm"
 )
@@ -151,7 +152,8 @@ type Product struct {
 }
 
 func main() {
-    logger.Init()
+    // Initialize logger
+    appLog := defaultlogger.GetLogger()
 
     // Database connection
     dsn := "host=localhost port=5432 user=postgres password=postgres dbname=products"
@@ -247,9 +249,10 @@ func (s *OrderService) CreateOrder(order *models.Order) error {
         return errors.Wrap(err, "user not found")
     }
 
-    s.logger.Info("Creating order for user",
-        logger.Field("userId", user.ID),
-        logger.Field("userName", user.Name))
+    s.logger.Infow("Creating order for user", logger.Fields{
+        "user_id": user.ID,
+        "user_name": user.Name,
+    })
 
     // Verify products and calculate total
     var totalAmount float64
@@ -272,9 +275,10 @@ func (s *OrderService) CreateOrder(order *models.Order) error {
     order.TotalAmount = totalAmount
     order.Status = "pending"
 
-    s.logger.Info("Order created successfully",
-        logger.Field("orderId", order.ID),
-        logger.Field("totalAmount", totalAmount))
+    s.logger.Infow("Order created successfully", logger.Fields{
+        "order_id": order.ID,
+        "total_amount": totalAmount,
+    })
 
     return nil
 }

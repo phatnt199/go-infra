@@ -1,0 +1,37 @@
+.rootWrapper {
+  display: flex;
+  flex-direction: row;
+  min-height: 100vh;
+  position: relative;
+  width: 100%;
+}
+
+/* This wrapper ensures that Docusaurus layout stays intact */
+.mainContent {
+  flex: 1;
+  overflow: visible;
+  display: block;
+  transition: margin-right 0.3s ease;
+}
+
+/* When chat is open, adjust margin */
+.rootWrapperChatOpen .mainContent {
+  margin-right: 400px;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .rootWrapperChatOpen .mainContent {
+    margin-right: 350px;
+  }
+}
+
+@media (max-width: 768px) {
+  .rootWrapper {
+    display: flex;
+  }
+
+  .rootWrapperChatOpen .mainContent {
+    margin-right: 0;
+  }
+}

@@ -1,0 +1,130 @@
+.sourceHandler {
+  margin-top: 12px;
+  border-top: 1px solid var(--ifm-color-emphasis-200);
+  padding-top: 12px;
+}
+
+.sourceToggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 12px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--ifm-color-emphasis-200);
+  color: var(--ifm-font-color-base);
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-size: 0.9em;
+  font-weight: 600;
+  text-align: left;
+}
+
+.sourceToggle:hover {
+  background: var(--ifm-color-emphasis-50);
+}
+
+.sourceIcon {
+  font-size: 1.1em;
+}
+
+.sourceLabel {
+  flex: 1;
+}
+
+.arrow {
+  transition: transform 0.2s ease;
+  display: inline-block;
+}
+
+.arrowOpen {
+  transform: rotate(180deg);
+}
+
+.sourcesList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.sourceItem {
+  padding: 10px 12px;
+  background: var(--ifm-color-emphasis-50);
+  border: 1px solid var(--ifm-color-emphasis-200);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sourceItem:hover {
+  background: var(--ifm-color-emphasis-100);
+  border-color: var(--ifm-color-primary);
+  transform: translateX(2px);
+}
+
+.sourceItem:focus-visible {
+  outline: 2px solid var(--ifm-color-primary);
+  outline-offset: -1px;
+}
+
+.sourceItemHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: relative;
+}
+
+.sourceTitle {
+  font-size: 0.9em;
+  color: var(--ifm-font-color-base);
+  word-break: break-word;
+}
+
+.sourceLink {
+  font-size: 0.8em;
+  color: var(--ifm-color-primary);
+  font-family: monospace;
+  word-break: break-all;
+}
+
+.clickHint {
+  position: absolute;
+  right: 0;
+  top: 0;
+  color: var(--ifm-color-primary);
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.sourceItem:hover .clickHint {
+  opacity: 1;
+}
+
+.sourceContent {
+  margin-top: 6px;
+  font-size: 0.8em;
+  color: var(--ifm-color-emphasis-700);
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+/* Dark mode adjustments */
+[data-theme="dark"] .sourceToggle:hover {
+  background: var(--ifm-background-surface-color);
+}
+
+[data-theme="dark"] .sourceItem {
+  background: var(--ifm-background-surface-color);
+}
+
+[data-theme="dark"] .sourceItem:hover {
+  background: rgba(102, 126, 234, 0.1);
+}
+
+[data-theme="dark"] .sourceContent {
+  color: var(--ifm-color-emphasis-600);
+}

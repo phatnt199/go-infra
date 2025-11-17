@@ -188,13 +188,16 @@ func (s *authService) Register(email, password, name string) (*domain.User, erro
     }
 
     if err := s.userRepo.Create(user); err != nil {
-        s.logger.Error("Failed to create user", logger.Field("error", err))
+        s.logger.Errorw("Failed to create user", logger.Fields{
+            "error": err.Error(),
+        })
         return nil, errors.Wrap(err, "failed to create user")
     }
 
-    s.logger.Info("User registered",
-        logger.Field("userId", user.ID),
-        logger.Field("email", user.Email))
+    s.logger.Infow("User registered", logger.Fields{
+        "user_id": user.ID,
+        "email": user.Email,
+    })
 
     return user, nil
 }
@@ -222,9 +225,10 @@ func (s *authService) Login(email, password string) (string, error) {
     user.LastLoginAt = &now
     s.userRepo.Update(user)
 
-    s.logger.Info("User logged in",
-        logger.Field("userId", user.ID),
-        logger.Field("email", user.Email))
+    s.logger.Infow("User logged in", logger.Fields{
+        "user_id": user.ID,
+        "email": user.Email,
+    })
 
     return token, nil
 }
@@ -382,7 +386,7 @@ func main() {
     }
 
     // Initialize logger
-    logger.Init()
+    appLog := defaultlogger.GetLogger()
 
     // Setup database
     dsn := cfg.Database.DSN()
@@ -398,7 +402,7 @@ func main() {
     userRepo := repository.NewUserRepository(db)
 
     // Initialize services
-    authService := service.NewAuthService(userRepo, cfg.JWT.Secret, logger.Default())
+    authService := service.NewAuthService(userRepo, cfg.JWT.Secret, appLog)
 
     // Setup HTTP server
     app, router := fiber.New()

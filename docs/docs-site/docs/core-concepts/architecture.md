@@ -69,11 +69,11 @@ func NewUserService(
 Components are organized as **modules** that can be composed:
 
 ```go
-app := fxapp.NewApplicationBuilder().
-    ProvideModule(fiber_adapter.Module).    // HTTP server
-    ProvideModule(gorm.Module).             // Database
-    ProvideModule(authentication.Module).   // Authentication
-    Build()
+appBuilder := fxapp.NewApplicationBuilder()
+appBuilder.ProvideModule(fiber_adapter.Module)    // HTTP server
+appBuilder.ProvideModule(gorm.Module)             // Database
+appBuilder.ProvideModule(authentication.Module)   // Authentication
+app := appBuilder.Build()
 ```
 
 Each module:

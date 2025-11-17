@@ -296,11 +296,11 @@ import (
 // @host localhost:8080
 // @BasePath /api/v1
 func main() {
-    app := fxapp.NewApplicationBuilder().
-        ProvideModule(fiber_adapter.Module).
-        ProvideModule(gorm.Module).
-        ProvideModule(modules.Module).
-        Build()
+    appBuilder := fxapp.NewApplicationBuilder()
+    appBuilder.ProvideModule(fiber_adapter.Module)
+    appBuilder.ProvideModule(gorm.Module)
+    appBuilder.ProvideModule(modules.Module)
+    app := appBuilder.Build()
 
     app.Run()
 }
@@ -379,11 +379,11 @@ curl -X DELETE http://localhost:8080/api/v1/users/{id}
 go-infra uses modules for dependency injection:
 
 ```go
-app := fxapp.NewApplicationBuilder().
-    ProvideModule(fiber_adapter.Module).    // HTTP server
-    ProvideModule(gorm.Module).             // Database
-    ProvideModule(modules.Module).          // Your app module
-    Build()
+appBuilder := fxapp.NewApplicationBuilder()
+appBuilder.ProvideModule(fiber_adapter.Module)    // HTTP server
+appBuilder.ProvideModule(gorm.Module)             // Database
+appBuilder.ProvideModule(modules.Module)          // Your app module
+app := appBuilder.Build()
 ```
 
 ### 2. Repository Pattern

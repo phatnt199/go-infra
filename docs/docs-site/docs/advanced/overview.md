@@ -54,8 +54,9 @@ type UserCommandHandler struct {
 }
 
 func (h *UserCommandHandler) HandleCreateUser(cmd CreateUserCommand) (*domain.User, error) {
-    h.logger.Info("Handling CreateUser command",
-        logger.Field("email", cmd.Email))
+    h.logger.Infow("Handling CreateUser command", logger.Fields{
+        "email": cmd.Email,
+    })
 
     user := &domain.User{
         Name:  cmd.Name,
@@ -200,16 +201,22 @@ func (s *WebSocketServer) HandleConnection(c *websocket.Conn) {
     }()
 
     s.clients[c] = true
-    s.logger.Info("New WebSocket connection", logger.Field("total", len(s.clients)))
+    s.logger.Infow("New WebSocket connection", logger.Fields{
+        "total": len(s.clients),
+    })
 
     for {
         messageType, message, err := c.ReadMessage()
         if err != nil {
-            s.logger.Error("Read error", logger.Field("error", err))
+            s.logger.Errorw("Read error", logger.Fields{
+                "error": err.Error(),
+            })
             break
         }
 
-        s.logger.Info("Received message", logger.Field("message", string(message)))
+        s.logger.Infow("Received message", logger.Fields{
+            "message": string(message),
+        })
 
         // Broadcast to all clients
         s.Broadcast(messageType, message)
@@ -220,7 +227,9 @@ func (s *WebSocketServer) Broadcast(messageType int, message []byte) {
     for client := range s.clients {
         err := client.WriteMessage(messageType, message)
         if err != nil {
-            s.logger.Error("Write error", logger.Field("error", err))
+            s.logger.Errorw("Write error", logger.Fields{
+                "error": err.Error(),
+            })
             client.Close()
             delete(s.clients, client)
         }
@@ -234,7 +243,8 @@ func (s *WebSocketServer) Broadcast(messageType int, message []byte) {
 // main.go
 func main() {
     app := fiber.New()
-    wsServer := websocket.NewWebSocketServer(logger.Default())
+    appLog := defaultlogger.GetLogger()
+    wsServer := websocket.NewWebSocketServer(appLog)
 
     app.Get("/ws", websocket.New(func(c *websocket.Conn) {
         wsServer.HandleConnection(c)

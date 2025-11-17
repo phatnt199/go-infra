@@ -89,18 +89,23 @@ db.AutoMigrate(&User{}, &Product{})
 
 ### Logger Module
 
-Structured logging with context:
+Structured logging with dependency injection:
 
 ```go
-import "github.com/phatnt199/go-infra/pkg/logger"
+import (
+    "github.com/phatnt199/go-infra/pkg/logger"
+    zaplogger "github.com/phatnt199/go-infra/pkg/logger/zap"
+)
 
-// Initialize logger
-logger.Init()
-
-// Log with context
-logger.Info("User created",
-    logger.Field("userId", user.ID),
-    logger.Field("email", user.Email))
+// Logger is provided via Fx module
+// In your component:
+func MyService(log logger.Logger) {
+    // Log with structured fields
+    log.Infow("User created", logger.Fields{
+        "user_id": user.ID,
+        "email": user.Email,
+    })
+}
 ```
 
 ## Creating Custom Modules

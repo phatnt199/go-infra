@@ -50,7 +50,14 @@ docs/
 ├── authentication/
 │   └── getting-started.md            # Authentication guide
 ├── components/
-│   ├── logger.md                     # Logger documentation
+│   ├── logger/                       # Logger documentation
+│   │   ├── index.md                  # Logger overview
+│   │   ├── quickstart.md             # Quick start guide
+│   │   ├── configuration.md          # Configuration options
+│   │   ├── usage.md                  # Usage guide
+│   │   ├── fx-integration.md         # Fx integration
+│   │   ├── adapters.md               # External adapters
+│   │   └── best-practices.md         # Best practices
 │   └── crypto.md                     # Crypto documentation
 └── examples/
     └── users-api.md                  # Users API example

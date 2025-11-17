@@ -17,9 +17,9 @@ import (
 )
 
 func main() {
-    app := fxapp.NewApplicationBuilder().
-        ProvideModule(gorm.Module).
-        Build()
+    appBuilder := fxapp.NewApplicationBuilder()
+    appBuilder.ProvideModule(gorm.Module)
+    app := appBuilder.Build()
 
     app.Run()
 }
@@ -117,10 +117,10 @@ type Role struct {
 
 ```go
 func main() {
-    app := fxapp.NewApplicationBuilder().
-        ProvideModule(gorm.Module).
-        Provide(fx.Invoke(runMigrations)).
-        Build()
+    appBuilder := fxapp.NewApplicationBuilder()
+    appBuilder.ProvideModule(gorm.Module)
+    appBuilder.Provide(fx.Invoke(runMigrations))
+    app := appBuilder.Build()
 
     app.Run()
 }
@@ -137,17 +137,17 @@ func runMigrations(db *gorm.DB) {
 ### With Logging
 
 ```go
-func runMigrations(db *gorm.DB, logger logger.Logger) {
-    logger.Info("Running migrations...")
+func runMigrations(db *gorm.DB, log logger.Logger) {
+    log.Info("Running migrations...")
 
     if err := db.AutoMigrate(
         &domain.User{},
         &domain.Post{},
     ); err != nil {
-        logger.Fatal("Migration failed", logger.Err(err))
+        log.Err("Migration failed", err)
     }
 
-    logger.Info("Migrations completed")
+    log.Info("Migrations completed")
 }
 ```
 
@@ -317,11 +317,11 @@ func (r *userRepository) Delete(ctx context.Context, id string) error {
 
 ```go
 func main() {
-    app := fxapp.NewApplicationBuilder().
-        ProvideModule(gorm.Module).
-        Provide(repository.NewUserRepository).
-        Provide(service.NewUserService).
-        Build()
+    appBuilder := fxapp.NewApplicationBuilder()
+    appBuilder.ProvideModule(gorm.Module)
+    appBuilder.Provide(repository.NewUserRepository)
+    appBuilder.Provide(service.NewUserService)
+    app := appBuilder.Build()
 
     app.Run()
 }

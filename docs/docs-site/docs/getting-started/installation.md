@@ -224,7 +224,7 @@ Without this file, the application will fail to start.
 		"host": "db.production.com",
 		"port": 5432,
 		"user": "prod_user",
-		"password": "${DB_PASSWORD}",
+		"password": "secret-password",
 		"dbname": "myapp_prod",
 		"sslmode": true
 	},
@@ -238,15 +238,31 @@ Without this file, the application will fail to start.
 
 ### Environment Variable Overrides
 
-You can override config file values with environment variables:
+go-infra uses struct tags to map environment variables. You can override config file values by setting environment variables that match the struct field tags.
+
+**Common environment variables:**
 
 ```bash
-# Override database password
-export DB_PASSWORD=secret-password
+# HTTP Server
+export TcpPort=:8080
+export Host=0.0.0.0
+export BasePath=/api/v1
 
-# Override log level
-export LOG_LEVEL=debug
+# Database (GORM)
+export DB_HOST=db.production.com
+export DB_PORT=5432
+export DB_USER=prod_user
+export DB_PASSWORD=secret-password
+export DB_NAME=myapp_prod
+export SslMode=true
+
+# Logger
+export LOG_LEVEL=info
 ```
+
+:::important
+Environment variable names are **case-sensitive** and must match the struct tag names exactly. See your module's config struct for the exact tag names (e.g., `env:"TcpPort"` in `FiberHttpOptions`).
+:::
 
 See [Configuration Management](../core-concepts/configuration) for complete details.
 
